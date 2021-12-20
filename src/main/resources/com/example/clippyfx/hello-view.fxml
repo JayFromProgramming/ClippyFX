@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -23,7 +24,7 @@
                <AnchorPane fx:id="LoadPane" layoutX="310.0" layoutY="196.0" prefHeight="106.0" prefWidth="267.0">
                   <children>
                    <Button fx:id="LoadFileButton" layoutX="14.0" layoutY="26.0" minWidth="56.0" mnemonicParsing="false" onMousePressed="#loadFileOption" prefHeight="26.0" text="Load File" />
-                     <Button fx:id="LoadLink" layoutX="165.0" layoutY="27.0" mnemonicParsing="false" onMousePressed="#loadLinkOption" text="Load Youtube" />
+                     <Button fx:id="LoadLink" layoutX="165.0" layoutY="27.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" onMousePressed="#loadLinkOption" text="Load Youtube" />
                      <TextField fx:id="VideoURI" layoutX="10.0" layoutY="62.0" prefHeight="26.0" prefWidth="203.0" />
                      <Button fx:id="goButton" layoutX="219.0" layoutY="62.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" text="Go!" />
                      <Button fx:id="vp9LoadButton" layoutX="89.0" layoutY="27.0" mnemonicParsing="false" onMouseClicked="#loadVP9" text="Load VP9" />
@@ -46,10 +47,11 @@
          <Text fx:id="clipEndText" layoutX="880.0" layoutY="619.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
          <ButtonBar layoutX="168.0" layoutY="551.0" prefHeight="40.0" prefWidth="172.0">
            <buttons>
-             <Button fx:id="ejectButton" disable="true" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
                <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onMouseClicked="#playPauseVideo" text="Play" />
+             <Button fx:id="ejectButton" disable="true" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
            </buttons>
          </ButtonBar>
+         <TextArea fx:id="youtubeData" layoutX="1013.0" layoutY="514.0" prefHeight="37.0" prefWidth="43.0" visible="false" />
       </children>
    </AnchorPane>
 </VBox>

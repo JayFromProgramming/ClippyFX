@@ -3,10 +3,7 @@ package com.example.clippyfx;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +16,8 @@ import javafx.stage.FileChooser;
 import javafx.animation.AnimationTimer;
 import javafx.util.Duration;
 import javafx.stage.Stage;
+import org.json.JSONArray;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,10 +48,12 @@ public class MainController {
     public Button clipItButton;
     public Button vp9LoadButton;
     public Button ejectButton;
+    public TextArea youtubeData;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
     private float fps = 30;
+    public JSONArray videoURIs;
 
     @FXML
     private Label welcomeText;
@@ -62,7 +63,7 @@ public class MainController {
         System.out.println("Media loading...");
         Media media = new Media(VideoURI.getText());
         mediaPlayer = new MediaPlayer(media);
-
+        clipEnd.setValue(100);
         mediaPlayer.setAutoPlay(false);
         mediaPlayer.setCycleCount(1);
         MediaView mediaView = new MediaView(mediaPlayer);
@@ -211,7 +212,7 @@ public class MainController {
 
     public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
         // ffmpeg -ss {startTime} -i '{file/URI}' -c:v libvpx-vp9
-
+        System.out.println(youtubeData);
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("clipping-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
@@ -219,10 +220,21 @@ public class MainController {
         stage.setScene(scene);
         stage.show();
         ClippingView clippingProgressWindow = fxmlLoader.getController();
-        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps);
+        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, youtubeData, videoURIs);
 
     }
 
     public void loadVP9(MouseEvent mouseEvent) {
+    }
+
+    public void loadYoutube(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("youtube-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 213);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Youtube video loader");
+        stage.setScene(scene);
+        stage.show();
+        YoutubeView youtubeSelectView = fxmlLoader.getController();
+        youtubeSelectView.passObjects(VideoURI, videoURIs, youtubeData);
     }
 }

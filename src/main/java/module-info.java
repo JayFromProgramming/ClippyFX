@@ -11,6 +11,7 @@ module com.example.clippyfx {
     requires eu.hansolo.tilesfx;
     requires javafx.media;
     requires commons.lang3;
+    requires org.json;
 
     opens com.example.clippyfx to javafx.fxml;
     exports com.example.clippyfx;

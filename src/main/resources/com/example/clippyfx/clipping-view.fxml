@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.TextArea?>
@@ -18,5 +19,6 @@
       <TextField fx:id="pathBox" layoutX="97.0" layoutY="255.0" onMouseClicked="#openExplorer" prefHeight="26.0" prefWidth="403.0" promptText="Set path" />
       <Button fx:id="clipItButton" layoutX="274.0" layoutY="324.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip it!" />
       <Text fx:id="progressText" layoutX="37.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" wrappingWidth="529.5999938964844" />
+      <CheckBox fx:id="enableMP4" layoutX="351.0" layoutY="327.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="163.0" text="Compatibility Mode" />
    </children>
 </AnchorPane>

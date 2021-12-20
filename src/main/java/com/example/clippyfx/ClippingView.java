@@ -1,6 +1,7 @@
 package com.example.clippyfx;
 
 import javafx.animation.AnimationTimer;
+import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -10,8 +11,9 @@ import javafx.stage.DirectoryChooser;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 
 public class ClippingView {
 
@@ -22,6 +24,7 @@ public class ClippingView {
     public TextField pathBox;
     public Button clipItButton;
     public Text progressText;
+    public CheckBox enableMP4;
 
     private AnimationTimer timer;
     public Slider clipStart;
@@ -38,6 +41,8 @@ public class ClippingView {
     private ArrayList<String> splitList;
     private boolean clipping = false;
     private Process clipper;
+    private TextArea youtubeData;
+    private JSONArray videoURIs;
 
     public ClippingView() {
 
@@ -107,7 +112,7 @@ public class ClippingView {
             try {
                 if (reader.ready()) {
                     line = reader.readLine();
-                    System.out.println(line);
+//                    System.out.println(line);
                 }
             }catch (IOException ignored){}
             if (line != null) {
@@ -117,11 +122,9 @@ public class ClippingView {
             if (!clipper.isAlive()) {
                 if (clipper.exitValue() != 0) {
                     System.out.println("Clipping failed.");
-                    InputStreamReader isr = new InputStreamReader(clipper.getErrorStream());
-                    BufferedReader br = new BufferedReader(isr);
                     ffmpegOutput.setText("");
                     try {
-                        while ((line = br.readLine()) != null) {
+                        while ((line = reader.readLine()) != null) {
                             System.out.println(line);
                             ffmpegOutput.appendText(line + "\n");
                         }
@@ -139,9 +142,13 @@ public class ClippingView {
 
     public void clipIt(MouseEvent mouseEvent) throws IOException {
         if (clipping){
-            // Cancel the current clip
-            clipper.destroy();
-            clipping = false;
+//            // Cancel the current clip
+//            Runtime.getRuntime().exec("taskkill /PID " + clipper.pid() + " /T /F");
+//            System.out.println(clipper.pid());
+//            clipper.destroyForcibly();
+//            clipping = false;
+//            ffmpegOutput.appendText("Clipping cancelled.\n");
+            return;
         }
         System.out.println("Clipping...");
         swapVisibility();
@@ -162,12 +169,25 @@ public class ClippingView {
         clipItButton.setText("Abort");
     }
 
-    public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps) {
+    public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
+                            TextArea isYoutube, JSONArray videoURIs) {
         this.mediaPlayer = mediaPlayer;
         this.clipStart = clipStart;
         this.clipEnd = clipEnd;
         this.VideoURI = VideoURI;
         this.fps = fps;
-        this.totalFrames = (int) (mediaPlayer.getTotalDuration().toSeconds() * fps);
+        this.youtubeData = isYoutube;
+        this.videoURIs = videoURIs;
+//        if (!this.youtubeData.getText().equals("")){
+//
+//        }
+
+        int[] hs = {144, 240, 360, 480, 720, 1080, 1440, 2160};
+        ArrayList<Integer> heights = new ArrayList<>();
+
+        this.typeBox.setItems(FXCollections.observableArrayList(""));
+
+        this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
+                clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
     }
 }
