@@ -9,6 +9,8 @@ module com.example.clippyfx {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
+    requires javafx.media;
+    requires commons.lang3;
 
     opens com.example.clippyfx to javafx.fxml;
     exports com.example.clippyfx;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="213.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.YoutubeView">
+   <children>
+      <ImageView fx:id="thumbnailViewer" fitHeight="150.0" fitWidth="200.0" layoutX="30.0" layoutY="30.0" pickOnBounds="true" preserveRatio="true" />
+      <TextField fx:id="youtubeLinkBox" layoutX="256.0" layoutY="107.0" prefHeight="26.0" prefWidth="266.0" promptText="Enter youtube link" />
+      <Button layoutX="528.0" layoutY="107.0" mnemonicParsing="false" text="Find" />
+   </children>
+</AnchorPane>
