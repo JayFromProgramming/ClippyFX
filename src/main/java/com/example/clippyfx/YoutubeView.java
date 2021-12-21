@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import Interfaces.PopOut;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -12,13 +13,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
 
-public class YoutubeView {
+public class YoutubeView implements PopOut {
 
     public ImageView thumbnailViewer;
     public TextField youtubeLinkBox;
@@ -30,7 +33,7 @@ public class YoutubeView {
     public TextArea videoInfo;
     public ProgressIndicator progressBar;
 
-
+    private boolean isAlive = true;
     private String mainURI;
     private JSONObject json;
     private String thumbnailURI;
@@ -42,7 +45,7 @@ public class YoutubeView {
         this.videoURIs = videoURIs;
         this.youtubeData = isYoutube;
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
-
+        this.closeHook(this.pane);
     }
 
     public void findVideo(MouseEvent mouseEvent) throws IOException {
@@ -125,4 +128,35 @@ public class YoutubeView {
         youtubeData.setText(this.json.toString());
         ((Stage) pane.getScene().getWindow()).close();
     }
+
+    @Override
+    public Window getWindow() {
+        return pane.getScene().getWindow();
+    }
+
+    @Override
+    public popOutType getType() {
+        return popOutType.YoutubeFinderView;
+    }
+
+    @Override
+    public void close() {
+        isAlive = false;
+        ((Stage) pane.getScene().getWindow()).close();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    private void onClose(WindowEvent event) {
+        System.out.println("Window closed.");
+        this.isAlive = false;
+    }
+
+    private void closeHook(AnchorPane pain){
+        pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::onClose);
+    }
+
 }

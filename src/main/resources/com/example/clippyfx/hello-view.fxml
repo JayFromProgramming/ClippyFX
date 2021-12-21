@@ -19,15 +19,16 @@
     <Label fx:id="welcomeText" />
    <AnchorPane fx:id="Pain" prefHeight="702.0" prefWidth="1240.0">
       <children>
-         <AnchorPane fx:id="VideoPain" layoutY="14.0" maxHeight="541.0" maxWidth="854.0" prefHeight="541.0" prefWidth="854.0">
+         <AnchorPane fx:id="VideoPain" layoutY="14.0" maxHeight="541.0" maxWidth="909.0" prefHeight="541.0" prefWidth="909.0">
             <children>
-               <AnchorPane fx:id="LoadPane" layoutX="294.0" layoutY="206.0" prefHeight="106.0" prefWidth="267.0">
+               <AnchorPane fx:id="LoadPane" layoutX="294.0" layoutY="198.0" prefHeight="126.0" prefWidth="267.0">
                   <children>
-                   <Button fx:id="LoadFileButton" layoutX="14.0" layoutY="26.0" minWidth="56.0" mnemonicParsing="false" onMousePressed="#loadFileOption" prefHeight="26.0" text="Load File" />
-                     <Button fx:id="LoadLink" layoutX="165.0" layoutY="27.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" onMousePressed="#loadLinkOption" text="Load Youtube" />
-                     <TextField fx:id="VideoURI" layoutX="10.0" layoutY="62.0" prefHeight="26.0" prefWidth="203.0" />
-                     <Button fx:id="goButton" layoutX="219.0" layoutY="62.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" text="Go!" />
-                     <Button fx:id="vp9LoadButton" layoutX="89.0" layoutY="27.0" mnemonicParsing="false" onMouseClicked="#loadVP9" text="Load VP9" />
+                     <TextField fx:id="VideoURI" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
+                     <Button fx:id="goButton" layoutX="217.0" layoutY="85.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" prefHeight="26.0" prefWidth="41.0" text="Go!" />
+                     <Button fx:id="vp9LoadButton" layoutX="10.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#loadVP9" prefWidth="124.0" text="Advanced File Load" />
+                   <Button fx:id="LoadFileButton" layoutX="150.0" layoutY="50.0" mnemonicParsing="false" onMousePressed="#loadFileOption" prefWidth="108.0" text="Basic File Load" />
+                     <Button fx:id="youtubeButton" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" onMousePressed="#loadLinkOption" text="Youtube Video Load" />
+                   <Button layoutX="150.0" layoutY="14.0" mnemonicParsing="false" text="Program Settings" />
                   </children>
                </AnchorPane>
             </children>
@@ -47,7 +48,7 @@
          <Text fx:id="clipEndText" layoutX="729.0" layoutY="621.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
          <ButtonBar layoutX="17.0" layoutY="553.0" prefHeight="40.0" prefWidth="172.0">
            <buttons>
-               <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onMouseClicked="#playPauseVideo" text="Play" />
+               <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onMouseClicked="#playPauseVideo" text="Pause" />
              <Button fx:id="ejectButton" disable="true" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
            </buttons>
          </ButtonBar>

@@ -1,5 +1,7 @@
 package com.example.clippyfx;
 
+import HelperMethods.SettingsWrapper;
+import Interfaces.PopOut;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
@@ -12,10 +14,13 @@ import javafx.stage.DirectoryChooser;
 import java.io.*;
 import java.util.ArrayList;
 
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 
-public class ClippingView {
+public class ClippingView implements PopOut {
 
     public ProgressBar progressBar;
     public TextArea ffmpegOutput;
@@ -40,6 +45,7 @@ public class ClippingView {
     private float fps = 0.0f;
     private ArrayList<String> splitList;
     private boolean clipping = false;
+    private boolean isAlive = true;
     private Process clipper;
     private TextArea youtubeData;
     private JSONArray videoURIs;
@@ -56,7 +62,7 @@ public class ClippingView {
     public void openExplorer(MouseEvent mouseEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Select a folder to save the clip to.");
-        chooser.setInitialDirectory(new File("C:\\Users\\Aidan\\Documents\\Dascord"));
+        chooser.setInitialDirectory(new File(SettingsWrapper.getAdvancedLoadPath()));
         File selectedDirectory = chooser.showDialog(pain.getScene().getWindow());
         if (selectedDirectory != null) {
             pathBox.setText(selectedDirectory.getAbsolutePath());
@@ -171,6 +177,7 @@ public class ClippingView {
 
     public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
                             TextArea isYoutube, JSONArray videoURIs) {
+        closeHook(this.pain);
         this.mediaPlayer = mediaPlayer;
         this.clipStart = clipStart;
         this.clipEnd = clipEnd;
@@ -190,4 +197,35 @@ public class ClippingView {
         this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
                 clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
     }
+
+    @Override
+    public Window getWindow() {
+        return pain.getScene().getWindow();
+    }
+
+    @Override
+    public popOutType getType() {
+        return popOutType.ClippingView;
+    }
+
+    @Override
+    public void close() {
+        isAlive = false;
+        ((Stage) pain.getScene().getWindow()).close();
+    }
+
+    @Override
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    private void onClose(WindowEvent event) {
+        System.out.println("Window closed.");
+        this.isAlive = false;
+    }
+
+    private void closeHook(AnchorPane pain){
+        pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::onClose);
+    }
+
 }

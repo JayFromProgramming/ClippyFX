@@ -1,5 +1,7 @@
 package com.example.clippyfx;
 
+import HelperMethods.SettingsWrapper;
+import Interfaces.PopOut;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -21,6 +23,8 @@ import org.json.JSONArray;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainController {
@@ -33,7 +37,7 @@ public class MainController {
     public Button LoadFileButton;
     public Button goButton;
     public FileChooser fileChooser;
-    public Button LoadLink;
+    public Button youtubeButton;
     public AnchorPane LoadPane;
     public AnimationTimer timer;
     public Slider clipStart;
@@ -54,6 +58,7 @@ public class MainController {
     private boolean scrubbing = false;
     private float fps = 30;
     public JSONArray videoURIs;
+    public ArrayList<PopOut> popOuts = new ArrayList<>();
 
     @FXML
     private Label welcomeText;
@@ -64,7 +69,7 @@ public class MainController {
         Media media = new Media(VideoURI.getText());
         mediaPlayer = new MediaPlayer(media);
         clipEnd.setValue(100);
-        mediaPlayer.setAutoPlay(false);
+        mediaPlayer.setAutoPlay(true);
         mediaPlayer.setCycleCount(1);
         MediaView mediaView = new MediaView(mediaPlayer);
         mediaView.fitWidthProperty().bind(VideoPain.widthProperty());
@@ -158,8 +163,7 @@ public class MainController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("AVI Files", "*.avi"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MOV Files", "*.mov"));
         fileChooser.setTitle("Choose a file to clip");
-        // TODO: Make this a configurable option
-        fileChooser.setInitialDirectory(new java.io.File("C:\\Users\\Public\\Videos"));
+        fileChooser.setInitialDirectory(new java.io.File(SettingsWrapper.getBasicLoadPath()));
         java.io.File file = fileChooser.showOpenDialog(Pain.getScene().getWindow());
         if (file != null) {
             VideoURI.setText(file.toURI().toString());
@@ -204,6 +208,14 @@ public class MainController {
             new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
         } else if (keyEvent.getCode() == KeyCode.PERIOD) {
             new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
+        } else if (keyEvent.getCode() == KeyCode.SPACE) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+                playPauseButton.setText("Play");
+            } else {
+                mediaPlayer.play();
+                playPauseButton.setText("Pause");
+            }
         }
     }
 
@@ -218,10 +230,18 @@ public class MainController {
         stage.show();
         ClippingView clippingProgressWindow = fxmlLoader.getController();
         clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, youtubeData, videoURIs);
-
     }
 
-    public void loadVP9(MouseEvent mouseEvent) throws IOException {
+    public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException {
+        popOuts.removeIf(popOut -> !popOut.isAlive());
+        for (PopOut popOut : popOuts) {
+            if (popOut.getType() == PopOut.popOutType.ConverterView) {
+                if (popOut.isAlive()) {
+                    popOut.getWindow().requestFocus();
+                    return;
+                }
+            }
+        }
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
@@ -229,10 +249,20 @@ public class MainController {
         stage.setScene(scene);
         stage.show();
         CompatabilityatorView compat  = fxmlLoader.getController();
+        popOuts.add(compat);
         compat.passObjects(VideoURI);
     }
 
     public void loadYoutube(MouseEvent mouseEvent) throws IOException {
+        popOuts.removeIf(popOut -> !popOut.isAlive());
+        for (PopOut popOut : popOuts) {
+            if (popOut.getType() == PopOut.popOutType.YoutubeFinderView) {
+                if (popOut.isAlive()) {
+                    popOut.getWindow().requestFocus();
+                    return;
+                }
+            }
+        }
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("youtube-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 213);
         Stage stage = new Stage();
@@ -240,6 +270,7 @@ public class MainController {
         stage.setScene(scene);
         stage.show();
         YoutubeView youtubeSelectView = fxmlLoader.getController();
+        popOuts.add(youtubeSelectView);
         youtubeSelectView.passObjects(VideoURI, videoURIs, youtubeData);
     }
 }
