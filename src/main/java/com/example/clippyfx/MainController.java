@@ -224,7 +224,15 @@ public class MainController {
 
     }
 
-    public void loadVP9(MouseEvent mouseEvent) {
+    public void loadVP9(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Advanced video loader");
+        stage.setScene(scene);
+        stage.show();
+        CompatabilityatorView compat  = fxmlLoader.getController();
+        compat.passObjects(VideoURI);
     }
 
     public void loadYoutube(MouseEvent mouseEvent) throws IOException {

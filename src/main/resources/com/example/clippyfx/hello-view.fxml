@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="CENTER" maxHeight="720.0" maxWidth="1280.0" onKeyPressed="#keyPressed" prefHeight="720.0" prefWidth="1280.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.MainController">
+<VBox alignment="CENTER" maxHeight="720.0" maxWidth="1280.0" onKeyPressed="#keyPressed" prefHeight="686.0" prefWidth="949.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -19,9 +19,9 @@
     <Label fx:id="welcomeText" />
    <AnchorPane fx:id="Pain" prefHeight="702.0" prefWidth="1240.0">
       <children>
-         <AnchorPane fx:id="VideoPain" layoutX="193.0" maxHeight="541.0" maxWidth="854.0" prefHeight="541.0" prefWidth="854.0">
+         <AnchorPane fx:id="VideoPain" layoutY="14.0" maxHeight="541.0" maxWidth="854.0" prefHeight="541.0" prefWidth="854.0">
             <children>
-               <AnchorPane fx:id="LoadPane" layoutX="310.0" layoutY="196.0" prefHeight="106.0" prefWidth="267.0">
+               <AnchorPane fx:id="LoadPane" layoutX="294.0" layoutY="206.0" prefHeight="106.0" prefWidth="267.0">
                   <children>
                    <Button fx:id="LoadFileButton" layoutX="14.0" layoutY="26.0" minWidth="56.0" mnemonicParsing="false" onMousePressed="#loadFileOption" prefHeight="26.0" text="Load File" />
                      <Button fx:id="LoadLink" layoutX="165.0" layoutY="27.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" onMousePressed="#loadLinkOption" text="Load Youtube" />
@@ -32,26 +32,26 @@
                </AnchorPane>
             </children>
          </AnchorPane>
-         <ButtonBar layoutX="168.0" layoutY="587.0" prefHeight="40.0" prefWidth="166.0">
+         <ButtonBar layoutX="17.0" layoutY="589.0" prefHeight="40.0" prefWidth="166.0">
            <buttons>
              <Button fx:id="startInsert" disable="true" mnemonicParsing="false" onMouseClicked="#setStart" text="Set Start" />
                <Button fx:id="endInsert" disable="true" mnemonicParsing="false" onMouseClicked="#setEnd" text="Set End" />
            </buttons>
          </ButtonBar>
-         <Slider fx:id="clipStart" layoutX="364.0" layoutY="564.0" prefHeight="14.0" prefWidth="515.0" />
-         <Slider fx:id="clipEnd" layoutX="364.0" layoutY="607.0" prefHeight="14.0" prefWidth="515.0" />
-         <Slider fx:id="scrubBar" layoutX="364.0" layoutY="587.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="14.0" prefWidth="515.0" />
-         <Button fx:id="clipItButton" disable="true" layoutX="1013.0" layoutY="581.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip It!" />
-         <Text fx:id="clipStartText" layoutX="880.0" layoutY="576.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" />
-         <Text fx:id="scrubBarText" layoutX="880.0" layoutY="598.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
-         <Text fx:id="clipEndText" layoutX="880.0" layoutY="619.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
-         <ButtonBar layoutX="168.0" layoutY="551.0" prefHeight="40.0" prefWidth="172.0">
+         <Slider fx:id="clipStart" layoutX="213.0" layoutY="566.0" prefHeight="14.0" prefWidth="515.0" />
+         <Slider fx:id="clipEnd" layoutX="213.0" layoutY="609.0" prefHeight="14.0" prefWidth="515.0" />
+         <Slider fx:id="scrubBar" layoutX="213.0" layoutY="589.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="14.0" prefWidth="515.0" />
+         <Button fx:id="clipItButton" disable="true" layoutX="858.0" layoutY="583.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip It!" />
+         <Text fx:id="clipStartText" layoutX="729.0" layoutY="578.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" />
+         <Text fx:id="scrubBarText" layoutX="729.0" layoutY="600.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
+         <Text fx:id="clipEndText" layoutX="729.0" layoutY="621.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
+         <ButtonBar layoutX="17.0" layoutY="553.0" prefHeight="40.0" prefWidth="172.0">
            <buttons>
                <Button fx:id="playPauseButton" disable="true" mnemonicParsing="false" onMouseClicked="#playPauseVideo" text="Play" />
              <Button fx:id="ejectButton" disable="true" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
            </buttons>
          </ButtonBar>
-         <TextArea fx:id="youtubeData" layoutX="1013.0" layoutY="514.0" prefHeight="37.0" prefWidth="43.0" visible="false" />
+         <TextArea fx:id="youtubeData" layoutX="862.0" layoutY="516.0" prefHeight="37.0" prefWidth="43.0" visible="false" />
       </children>
    </AnchorPane>
 </VBox>

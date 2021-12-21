@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -27,6 +28,7 @@ public class YoutubeView {
     public Text videoTitle;
     public Button findVideoButton;
     public TextArea videoInfo;
+    public ProgressIndicator progressBar;
 
 
     private String mainURI;
@@ -39,6 +41,8 @@ public class YoutubeView {
         this.videoURI = videoURI;
         this.videoURIs = videoURIs;
         this.youtubeData = isYoutube;
+        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+
     }
 
     public void findVideo(MouseEvent mouseEvent) throws IOException {
@@ -55,6 +59,7 @@ public class YoutubeView {
     }
 
     private void getVideoInfo() throws IOException {
+        progressBar.setVisible(true);
         String link = youtubeLinkBox.getText();
         System.out.println(link);
         String command = "yt-dlp -j " + link;
@@ -77,6 +82,7 @@ public class YoutubeView {
                 break;
             }
         }
+        progressBar.setVisible(false);
     }
 
     private void updateThumbnail(){
