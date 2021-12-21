@@ -2,8 +2,8 @@ package com.example.clippyfx;
 
 import HelperMethods.SettingsWrapper;
 import Interfaces.PopOut;
+import Interfaces.PegGenerator;
 import javafx.animation.AnimationTimer;
-import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -18,25 +18,27 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 
 public class ClippingView implements PopOut {
 
     public ProgressBar progressBar;
     public TextArea ffmpegOutput;
     public TextField nameBox;
-    public ChoiceBox typeBox;
+  
     public TextField pathBox;
     public Button clipItButton;
     public Text progressText;
-    public CheckBox enableMP4;
+
+    public ChoiceBox videoSizeSelect;
+    public ChoiceBox presetBox;
+    public CheckBox sizeCap;
+    public AnchorPane pain;
 
     private AnimationTimer timer;
     public Slider clipStart;
     public MediaPlayer mediaPlayer;
     public TextField VideoURI;
     public Slider clipEnd;
-    public AnchorPane pain;
 
     private float clippingRate = 0.0f;
     private int currentFrame = 0;
@@ -47,8 +49,7 @@ public class ClippingView implements PopOut {
     private boolean clipping = false;
     private boolean isAlive = true;
     private Process clipper;
-    private TextArea youtubeData;
-    private JSONArray videoURIs;
+    private PegGenerator presetSelector;
 
     public ClippingView() {
 
@@ -72,7 +73,7 @@ public class ClippingView implements PopOut {
     private void swapVisibility() {
         pathBox.setDisable(false);
         nameBox.setDisable(false);
-        typeBox.setDisable(false);
+        sizeCap.setDisable(false);
 //        clipItButton.setVisible(false);
         progressBar.setVisible(true);
     }
@@ -176,23 +177,16 @@ public class ClippingView implements PopOut {
     }
 
     public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
-                            TextArea isYoutube, JSONArray videoURIs) {
+                            PegGenerator presetSelector) {
         closeHook(this.pain);
         this.mediaPlayer = mediaPlayer;
         this.clipStart = clipStart;
         this.clipEnd = clipEnd;
         this.VideoURI = VideoURI;
         this.fps = fps;
-        this.youtubeData = isYoutube;
-        this.videoURIs = videoURIs;
-//        if (!this.youtubeData.getText().equals("")){
-//
-//        }
+        this.presetSelector = presetSelector;
 
-        int[] hs = {144, 240, 360, 480, 720, 1080, 1440, 2160};
-        ArrayList<Integer> heights = new ArrayList<>();
 
-        this.typeBox.setItems(FXCollections.observableArrayList(""));
 
         this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
                 clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);

@@ -18,6 +18,28 @@ public class StreamedCommand {
     }
 
     /**
+     * @param command The command to execute as a string
+     * @return The process object as a string
+     * @throws IOException If the command has an error
+     */
+    public static String getCommandOutput(String command) throws IOException {
+        Process process = runCommand(command);
+        int exitCode = waitForExit(process);
+        if(exitCode != 0) {
+            throw new IOException("Command " + command + " exited with code " + exitCode);
+        }
+        StringBuilder output = new StringBuilder();
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+        }
+        return output.toString();
+    }
+
+
+    /**
      * Blocks until the command has finished executing, and returns the output
      * @param process The process to wait for
      * @return The exit code of the process.

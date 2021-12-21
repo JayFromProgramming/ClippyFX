@@ -77,7 +77,6 @@ public class CompatabilityatorView implements PopOut {
             String currentSize = StringUtils.substringBetween(line, "size=", "time=").replaceAll("\\s", "");
             String currentBitrate = StringUtils.substringBetween(line, "bitrate=", "speed=").replaceAll("\\s", "");
             String currentSpeed = StringUtils.substringAfter(line, "speed=").replaceAll("\\s", "");
-//            this.progressBar.setProgress((float) currentFrame / totalFrames);
             line = String.format("Frame %s of %s | %s, %s speed", currentFrame, totalFrames, currentBitrate, currentSpeed);
             return line;
         }
@@ -139,15 +138,15 @@ public class CompatabilityatorView implements PopOut {
 
     @SuppressWarnings("unchecked")
     private String checkHWACCEL(EncoderCheck.Encoders preferredEncoder) {
-        EncoderCheck.Encoders[] encoders = EncoderCheck.getEncoders();
+        ArrayList<EncoderCheck.Encoders> encoders = EncoderCheck.getEncoders();
         String command;
-        if (encoders[0] == EncoderCheck.Encoders.h264_nvenc) {
+        if (encoders.contains(EncoderCheck.Encoders.h264_nvenc)) {
             command = "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
             typeBox.getSelectionModel().select("h264_nvenc");
-        } else if (encoders[1] == EncoderCheck.Encoders.h264_amf) {
+        } else if (encoders.contains(EncoderCheck.Encoders.h264_amf)) {
             command = "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality speed -b:a 128k -y \"%s\"";
             typeBox.getSelectionModel().select("h264_amf");
-        }else if (encoders[2] == EncoderCheck.Encoders.libx264) {
+        }else if (encoders.contains(EncoderCheck.Encoders.libx264)) {
             command = "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -crf:v 25 -b:a 128k -y \"%s\"";
             typeBox.getSelectionModel().select("libx264");
         } else {

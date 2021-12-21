@@ -1,11 +1,6 @@
-package Interfaces;
+package EncodingMagic;
 
-public interface EncoderPreset {
-
-    /**
-     * Get display name of the preset
-     */
-    public String getDisplayName();
+public class EncoderPreset {
 
     /**
      * Create a FFMPEG command line string from the preset
@@ -15,12 +10,16 @@ public interface EncoderPreset {
      * @param outputFile The file FFMPEG will output to
      * @return A FFMPEG command line string to be executed
      */
-    public String getCommand(float startTime, float endTime, String inputFile, String outputFile);
+    public static String getCommand(float startTime, float endTime, String inputFile, String outputFile, int width, int height, String encoder){
+        return null;
+    }
 
 
     /**
      * Get if this preset supports hardware acceleration
      */
-    public boolean supportsHardwareAcceleration();
+    public String hardwareAcceleration(){
+        return null;
+    }
 
 }

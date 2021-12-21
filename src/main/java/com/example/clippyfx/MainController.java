@@ -229,7 +229,7 @@ public class MainController {
         stage.setScene(scene);
         stage.show();
         ClippingView clippingProgressWindow = fxmlLoader.getController();
-        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, youtubeData, videoURIs);
+        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, );
     }
 
     public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException {
