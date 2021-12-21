@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import UsefulThings.StreamedCommand;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
@@ -55,22 +56,14 @@ public class CompatabilityatorView {
     }
 
 
-    public void openExplorer(MouseEvent mouseEvent) {
-        DirectoryChooser chooser = new DirectoryChooser();
-        chooser.setTitle("Select a folder to save the clip to.");
-        chooser.setInitialDirectory(new File("C:\\Users\\Aidan\\Documents\\Dascord"));
-        File selectedDirectory = chooser.showDialog(pain.getScene().getWindow());
-        if (selectedDirectory != null) {
-            pathBox.setText(selectedDirectory.getAbsolutePath());
-        }
-    }
-
     private void swapVisibility() {
         pathBox.setDisable(true);
         nameBox.setDisable(true);
         typeBox.setDisable(true);
-//        clipItButton.setVisible(false);
+        enableMP4.setDisable(true);
+        enableMP4.setSelected(true);
         progressBar.setVisible(true);
+        clipItButton.setDisable(true);
     }
 
     private String getFFMPEGProgress(String line) {
@@ -102,11 +95,10 @@ public class CompatabilityatorView {
         @Override
         public void handle(long now) {
             String line = null;
-//            System.out.println("Reading");
             try {
                 if (reader.ready()) {
                     line = reader.readLine();
-//                    System.out.println(line);
+                    System.out.println(line);
                 }
             }catch (IOException ignored){}
             if (line != null) {
@@ -129,6 +121,11 @@ public class CompatabilityatorView {
                     System.out.println("Clipping successful.");
                     progressBar.setProgress(1);
                     stop();
+                    File temp = new File("TempWorkingFile.mp4");
+                    if (temp.exists()) {
+                        VideoURI.setText(temp.toURI().toString());
+                        temp.deleteOnExit(); // Clean up after yourself
+                    }
                     ((Stage) pain.getScene().getWindow()).close();
                 }
                 stop();
@@ -136,26 +133,36 @@ public class CompatabilityatorView {
         }
     }
 
+    private String checkHWACCEL(String fileName) throws IOException {
+        Process hwaccel = StreamedCommand.runCommand("ffmpeg -i \"" + fileName + "\" -c:v h264_nvenc -frames 1 -f null NUL");
+        int resultCode = StreamedCommand.waitForExit(hwaccel);
+        String command;
+        if (resultCode == 0) {
+            command = "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+        } else{
+            hwaccel = StreamedCommand.runCommand("ffmpeg -i \"" + fileName + "\" -c:v h264_amf -frames 1 -f null NUL");
+            resultCode = StreamedCommand.waitForExit(hwaccel);
+            if (resultCode == 0){
+                command = "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality speed -b:a 128k -y \"%s\"";
+            } else{
+                command = "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -crf:v 25 -b:a 128k -y \"%s\"";
+            }
+        }
+        return command;
+    }
+
     public void clipIt() throws IOException {
         if (clipping){
-//            // Cancel the current clip
-//            Runtime.getRuntime().exec("taskkill /PID " + clipper.pid() + " /T /F");
-//            System.out.println(clipper.pid());
-//            clipper.destroyForcibly();
-//            clipping = false;
-//            ffmpegOutput.appendText("Clipping cancelled.\n");
             return;
         }
-        System.out.println("Clipping...");
+        System.out.println("Making clip shit n stuff...");
         swapVisibility();
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         String fileName = pathBox.getText();
         String fileSaveName = nameBox.getText();
-        String command = String.format("ffmpeg -i \"%s\" -c:v libx264 -c:a aac -b:v 1500k -b:a 128k -y \"%s\"",
+        String command = String.format(checkHWACCEL(fileName),
                 fileName, fileSaveName);
-        ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
-        builder.redirectErrorStream(true);
-        clipper = builder.start();
+        clipper = StreamedCommand.runCommand(command);
         new progressUpdater(clipper).start();
         clipping = true;
         clipItButton.setText("Abort");
@@ -180,10 +187,5 @@ public class CompatabilityatorView {
             nameBox.setText("TempWorkingFile.mp4");
         }
         clipIt();
-        File temp = new File("TempWorkingFile.mp4");
-        if (temp.exists()) {
-            VideoURI.setText(temp.toURI().toString());
-            temp.deleteOnExit(); // Clean up after yourself
-        }
     }
 }

@@ -156,10 +156,7 @@ public class MainController {
                 "*.mp4", "*.avi", "*.mov"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MP4 Files", "*.mp4"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("AVI Files", "*.avi"));
-//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MKV Files", "*.mkv"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MOV Files", "*.mov"));
-        // TODO: Add webm support
-//        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("WEBM Files", "*.webm"));
         fileChooser.setTitle("Choose a file to clip");
         // TODO: Make this a configurable option
         fileChooser.setInitialDirectory(new java.io.File("C:\\Users\\Public\\Videos"));
