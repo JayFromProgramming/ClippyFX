@@ -29,7 +29,7 @@ public interface PopOut {
     /**
      *  Close the popout
      */
-    void close();
+    boolean close();
 
     /**
      *  Gets if the current popout is alive

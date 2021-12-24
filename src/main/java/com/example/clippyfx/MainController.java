@@ -1,6 +1,8 @@
 package com.example.clippyfx;
 
+import EncodingMagic.FilePegGenerator;
 import HelperMethods.SettingsWrapper;
+import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +18,7 @@ import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.animation.AnimationTimer;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.stage.Stage;
 import org.json.JSONArray;
@@ -24,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 
@@ -60,8 +64,14 @@ public class MainController {
     public JSONArray videoURIs;
     public ArrayList<PopOut> popOuts = new ArrayList<>();
 
-    @FXML
-    private Label welcomeText;
+    public void onClose(WindowEvent event) {
+        for (PopOut popOut : popOuts) {
+            if(!popOut.close()) {
+                event.consume();
+                popOut.getWindow().requestFocus();
+            }
+        }
+    }
 
     @FXML
     protected void onMediaLoad() throws IOException {
@@ -229,7 +239,8 @@ public class MainController {
         stage.setScene(scene);
         stage.show();
         ClippingView clippingProgressWindow = fxmlLoader.getController();
-        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, );
+        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, new FilePegGenerator(),
+                VideoURI);
     }
 
     public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException {
@@ -248,7 +259,7 @@ public class MainController {
         stage.setTitle("ClippyFX: Advanced video loader");
         stage.setScene(scene);
         stage.show();
-        CompatabilityatorView compat  = fxmlLoader.getController();
+        CompatabilityatorView compat = fxmlLoader.getController();
         popOuts.add(compat);
         compat.passObjects(VideoURI);
     }
@@ -272,5 +283,28 @@ public class MainController {
         YoutubeView youtubeSelectView = fxmlLoader.getController();
         popOuts.add(youtubeSelectView);
         youtubeSelectView.passObjects(VideoURI, videoURIs, youtubeData);
+    }
+
+    public void onUncaughtException(Thread thread, Throwable throwable) {
+        System.out.println("Uncaught exception: " + throwable.getClass().getName());
+        System.out.println("Thread: " + thread.getName());
+        System.out.println("Cause: " + throwable.getCause());
+        System.out.println("Stack trace: ");
+        throwable.printStackTrace();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("\"" + thread.getName() + "\" has encountered an error");
+        alert.setHeaderText("Type: " + throwable.getClass().getName());
+        alert.setResizable(true);
+        StringBuilder sb = new StringBuilder();
+        int lines = 0;
+        for (StackTraceElement element : throwable.getStackTrace()) {
+            if (lines++ > 10) {
+                sb.append("Plus ").append(throwable.getStackTrace().length - lines).append(" more lines\n");
+                break;
+            };
+            sb.append(element.toString()).append("\n");
+        }
+        alert.setContentText(sb.toString());
+        alert.showAndWait();
     }
 }

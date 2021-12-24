@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,9 @@ public class HelloApplication extends Application {
         stage.setTitle("ClippyFX");
         stage.setScene(scene);
         stage.show();
+        MainController controller = fxmlLoader.getController();
+        controller.Pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);
+        Thread.setDefaultUncaughtExceptionHandler(controller::onUncaughtException);
     }
 
     public static void main(String[] args) throws IOException {

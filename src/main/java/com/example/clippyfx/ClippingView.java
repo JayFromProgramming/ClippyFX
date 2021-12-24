@@ -19,6 +19,15 @@ import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
 
+class clippingError extends Throwable {
+    public clippingError(String message) {
+        super(message);
+    }
+    public clippingError(String message, Throwable cause) {
+        super(message);
+    }
+}
+
 public class ClippingView implements PopOut {
 
     public ProgressBar progressBar;
@@ -26,6 +35,7 @@ public class ClippingView implements PopOut {
     public TextField nameBox;
   
     public TextField pathBox;
+    public TextField uri;
     public Button clipItButton;
     public Text progressText;
 
@@ -41,15 +51,14 @@ public class ClippingView implements PopOut {
     public Slider clipEnd;
 
     private float clippingRate = 0.0f;
-    private int currentFrame = 0;
     private int totalFrames = 0;
-    private float currentSpeed = 0.0f;
+    private String currentSize = "";
     private float fps = 0.0f;
     private ArrayList<String> splitList;
     private boolean clipping = false;
     private boolean isAlive = true;
-    private Process clipper;
     private PegGenerator presetSelector;
+    private Process clipper;
 
     public ClippingView() {
 
@@ -63,7 +72,7 @@ public class ClippingView implements PopOut {
     public void openExplorer(MouseEvent mouseEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Select a folder to save the clip to.");
-        chooser.setInitialDirectory(new File(SettingsWrapper.getAdvancedLoadPath()));
+        chooser.setInitialDirectory(new File(pathBox.getText()));
         File selectedDirectory = chooser.showDialog(pain.getScene().getWindow());
         if (selectedDirectory != null) {
             pathBox.setText(selectedDirectory.getAbsolutePath());
@@ -170,14 +179,14 @@ public class ClippingView implements PopOut {
         System.out.println(command);
         ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
         builder.redirectErrorStream(true);
-        clipper = builder.start();
+        this.clipper = builder.start();
         new progressUpdater(clipper).start();
         clipping = true;
         clipItButton.setText("Abort");
     }
 
     public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
-                            PegGenerator presetSelector) {
+                            PegGenerator presetSelector, TextField videoURI) {
         closeHook(this.pain);
         this.mediaPlayer = mediaPlayer;
         this.clipStart = clipStart;
@@ -185,8 +194,8 @@ public class ClippingView implements PopOut {
         this.VideoURI = VideoURI;
         this.fps = fps;
         this.presetSelector = presetSelector;
-
-
+        this.uri = videoURI;
+        this.pathBox.setText(SettingsWrapper.getBasicSavePath());
 
         this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
                 clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
@@ -203,9 +212,18 @@ public class ClippingView implements PopOut {
     }
 
     @Override
-    public void close() {
-        isAlive = false;
+    public boolean close() {
+        if (clipper.isAlive()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Clip in progress");
+            alert.setHeaderText("Can't close while clipping is in progress.");
+            alert.setContentText("Please wait until conversion is complete.");
+            alert.show();
+            return false;
+        }
         ((Stage) pain.getScene().getWindow()).close();
+        isAlive = false;
+        return true;
     }
 
     @Override
@@ -214,6 +232,15 @@ public class ClippingView implements PopOut {
     }
 
     private void onClose(WindowEvent event) {
+        if (clipper.isAlive()) {
+            event.consume();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Clip in progress");
+            alert.setHeaderText("Can't close while clipping is in progress.");
+            alert.setContentText("Please wait until conversion is complete.");
+            alert.showAndWait();
+            return;
+        }
         System.out.println("Window closed.");
         this.isAlive = false;
     }

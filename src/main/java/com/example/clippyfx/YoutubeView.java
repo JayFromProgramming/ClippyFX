@@ -140,9 +140,10 @@ public class YoutubeView implements PopOut {
     }
 
     @Override
-    public void close() {
+    public boolean close() {
         isAlive = false;
         ((Stage) pane.getScene().getWindow()).close();
+        return false;
     }
 
     @Override

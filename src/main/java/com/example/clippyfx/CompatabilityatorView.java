@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.channels.FileLockInterruptionException;
 import java.util.ArrayList;
 
 public class CompatabilityatorView implements PopOut {
@@ -50,6 +51,7 @@ public class CompatabilityatorView implements PopOut {
     private Process clipper;
     private TextArea youtubeData;
     private JSONArray videoURIs;
+    private FileChooser fileChooser;
 
     public CompatabilityatorView() {
 
@@ -175,6 +177,7 @@ public class CompatabilityatorView implements PopOut {
 
 
     private void finish(){
+        clipping = false;
         progressBar.setProgress(1);
         File temp = new File(nameBox.getText());
         if (temp.exists()) {
@@ -200,7 +203,7 @@ public class CompatabilityatorView implements PopOut {
         nameBox.setDisable(true);
         typeBox.setDisable(true);
         typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
-        FileChooser fileChooser = new FileChooser();
+        fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Advanced Formats",
                 "*.webm", "*.mkv", "*.mov"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Supported Formats",
@@ -225,9 +228,17 @@ public class CompatabilityatorView implements PopOut {
     }
 
     @Override
-    public void close() {
-        isAlive = false;
+    public boolean close() {
+        if (clipper.isAlive()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Clip in progress");
+            alert.setHeaderText("Can't close while conversion is in progress.");
+            alert.setContentText("Please wait until conversion is complete.");
+            alert.show();
+            return false;
+        }
         ((Stage) pain.getScene().getWindow()).close();
+        return true;
     }
 
     @Override
@@ -235,7 +246,20 @@ public class CompatabilityatorView implements PopOut {
         return isAlive;
     }
 
-    private void onClose(WindowEvent event) {
+    private void onClose(WindowEvent event) throws IllegalStateException {
+        if (clipper.isAlive()) {
+            event.consume();
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Clip in progress");
+            alert.setHeaderText("Can't close while conversion is in progress.");
+            alert.setContentText("Please wait until conversion is complete.");
+            alert.showAndWait();
+            throw new IllegalStateException("PopOut close is not allowed while a conversion is in progress.");
+        }
+        if (fileChooser != null) {
+            event.consume();
+            throw new IllegalStateException("PopOut close is not allowed while a file chooser is open.");
+        }
         System.out.println("Window closed.");
         this.isAlive = false;
     }
