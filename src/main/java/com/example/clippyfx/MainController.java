@@ -2,6 +2,7 @@ package com.example.clippyfx;
 
 import EncodingMagic.FilePegGenerator;
 import HelperMethods.SettingsWrapper;
+import HelperMethods.StreamedCommand;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.fxml.FXML;
@@ -106,17 +107,12 @@ public class MainController {
             }
         };
         timer.start();
-        String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + VideoURI.getText().substring(6, VideoURI.getText().length()) + "\"";
-        System.out.println(command);
-        Process frGetter = Runtime.getRuntime().exec(command);
-        while(frGetter.isAlive()) {
-            int i = 0;
+        if (!youtubeData.getText().equals("")){
+            fps = 30;
+        } else {
+            String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + VideoURI.getText().substring(6) + "\"";
+            fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(frGetter.getInputStream()));
-        String line = reader.readLine();
-
-        fps = (float) calcFrameRate(line);
 
 
         System.out.println("FPS: " + fps);
@@ -243,7 +239,7 @@ public class MainController {
                 VideoURI);
     }
 
-    public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException {
+    public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException, InterruptedException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
             if (popOut.getType() == PopOut.popOutType.ConverterView) {

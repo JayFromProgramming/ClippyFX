@@ -24,7 +24,7 @@ public class FilePegGenerator implements PegGenerator {
 
     public ArrayList<String> getSupportedModes(){
         ArrayList<String> modes = new ArrayList<>();
-        for (EncoderCheck.Encoders encoder: EncoderCheck.getEncoders()){
+        for (EncoderCheck.Encoder encoder: EncoderCheck.getEncoders()){
             modes.add(EncoderCheck.enumToString(encoder));
         }
         return modes;

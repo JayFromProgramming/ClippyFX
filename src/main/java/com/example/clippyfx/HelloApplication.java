@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import HelperMethods.EncoderCheck;
 import HelperMethods.SettingsWrapper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +16,7 @@ import java.nio.file.Path;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        EncoderCheck.checkEncoders();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");

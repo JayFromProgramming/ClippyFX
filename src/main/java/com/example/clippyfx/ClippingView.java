@@ -1,9 +1,12 @@
 package com.example.clippyfx;
 
+import HelperMethods.EncoderCheck;
+import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import Interfaces.PopOut;
 import Interfaces.PegGenerator;
 import javafx.animation.AnimationTimer;
+import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -17,16 +20,6 @@ import java.util.ArrayList;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.apache.commons.lang3.StringUtils;
-
-class clippingError extends Throwable {
-    public clippingError(String message) {
-        super(message);
-    }
-    public clippingError(String message, Throwable cause) {
-        super(message);
-    }
-}
 
 public class ClippingView implements PopOut {
 
@@ -87,28 +80,6 @@ public class ClippingView implements PopOut {
         progressBar.setVisible(true);
     }
 
-    private String getFFMPEGProgress(String line) {
-        if (line.contains("frame=")) {
-//            String[] split = line.split(" ");
-//            splitList.clear();
-//            for (String s : split) {
-//                if (!s.equals("")) splitList.add(s);
-//            }
-//            this.currentFrame = Integer.parseInt(splitList.get(1));
-//
-//            for (String value: splitList) {
-//                if (value.contains("fps=")) {
-//                    String[] split2 = value.split("=");
-//                    this.currentSpeed = Float.parseFloat(split2[1]);
-//                }
-//            }
-//            line= "On frame " + currentFrame + " of " + totalFrames + " at " + currentSpeed + " fps.";
-//            return line;
-
-        }
-        return "No progress available.";
-    }
-
     private class progressUpdater extends AnimationTimer{
 
         private final BufferedReader reader;
@@ -133,7 +104,8 @@ public class ClippingView implements PopOut {
             }catch (IOException ignored){}
             if (line != null) {
                 ffmpegOutput.appendText(line + "\n");
-                progressText.setText(getFFMPEGProgress(line));
+                progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, mediaPlayer.getTotalDuration().toSeconds(),
+                        fps, totalFrames, progressBar));
             }
             if (!clipper.isAlive()) {
                 if (clipper.exitValue() != 0) {
@@ -156,14 +128,10 @@ public class ClippingView implements PopOut {
         }
     }
 
-    public void clipIt(MouseEvent mouseEvent) throws IOException {
+    public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
         if (clipping){
-//            // Cancel the current clip
-//            Runtime.getRuntime().exec("taskkill /PID " + clipper.pid() + " /T /F");
-//            System.out.println(clipper.pid());
-//            clipper.destroyForcibly();
-//            clipping = false;
-//            ffmpegOutput.appendText("Clipping cancelled.\n");
+            FFmpegWrapper.killProcess(clipper);
+            clipping = false;
             return;
         }
         System.out.println("Clipping...");
@@ -171,11 +139,14 @@ public class ClippingView implements PopOut {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         double startTime = clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds();
         double endTime = clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds();
-        String fileName = VideoURI.getText().substring(6, VideoURI.getText().length());
+        String fileName = uri.getText();
+        if (fileName.contains("file:")) {
+            fileName = fileName.substring(6);
+        }
         String fileSaveName = pathBox.getText() + "\\" + nameBox.getText();
         if (startTime > endTime) throw new IllegalArgumentException("Start time cannot be greater than end time.");
-        String command = String.format("ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libvpx-vp9 -c:a libopus -b:v 1500k -b:a 128k -y \"%s\"",
-                startTime, fileName, endTime, fileSaveName);
+        String command = String.format("ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libvpx-vp9 -c:a libopus -b:v 1500k -b:a 128k -y \"%s.webm\"",
+                startTime, fileName, endTime - startTime, fileSaveName);
         System.out.println(command);
         ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
         builder.redirectErrorStream(true);
@@ -183,8 +154,10 @@ public class ClippingView implements PopOut {
         new progressUpdater(clipper).start();
         clipping = true;
         clipItButton.setText("Abort");
+        // TODO: GIANT GREEN CHECK MARK BABYYY WHOOOOOOOOOOO - Nick
     }
 
+    @SuppressWarnings("unchecked")
     public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
                             PegGenerator presetSelector, TextField videoURI) {
         closeHook(this.pain);
@@ -199,6 +172,9 @@ public class ClippingView implements PopOut {
 
         this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
                 clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
+
+        this.sizeCap.setSelected(SettingsWrapper.getSettingsBoolean("defaultAllow100MB"));
+        presetBox.setItems(FXCollections.observableArrayList(EncoderCheck.getEncodersString()));
     }
 
     @Override

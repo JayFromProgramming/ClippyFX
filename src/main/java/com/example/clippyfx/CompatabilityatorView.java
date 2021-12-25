@@ -1,6 +1,7 @@
 package com.example.clippyfx;
 
 import HelperMethods.EncoderCheck;
+import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
 import Interfaces.PopOut;
@@ -14,14 +15,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.channels.FileLockInterruptionException;
 import java.util.ArrayList;
 
 public class CompatabilityatorView implements PopOut {
@@ -45,7 +44,8 @@ public class CompatabilityatorView implements PopOut {
     private boolean isAlive = true;
     private final float clippingRate = 0.0f;
     private int totalFrames = 0;
-    private final float fps = 0.0f;
+    private double totalDuration = 0;
+    private float fps = 0.0f;
     private ArrayList<String> splitList;
     private boolean clipping = false;
     private Process clipper;
@@ -69,20 +69,7 @@ public class CompatabilityatorView implements PopOut {
         enableMP4.setDisable(true);
         enableMP4.setSelected(true);
         progressBar.setVisible(true);
-        clipItButton.setDisable(true);
-    }
-
-    private String getFFMPEGProgress(String line) {
-        if (line.contains("frame=")) {
-            int currentFrame = Integer.parseInt(StringUtils.substringBetween(line, "frame=", "fps=").replaceAll("\\s", ""));
-            float currentfps = Float.parseFloat(StringUtils.substringBetween(line, "fps=", "q=").replaceAll("\\s", ""));
-            String currentSize = StringUtils.substringBetween(line, "size=", "time=").replaceAll("\\s", "");
-            String currentBitrate = StringUtils.substringBetween(line, "bitrate=", "speed=").replaceAll("\\s", "");
-            String currentSpeed = StringUtils.substringAfter(line, "speed=").replaceAll("\\s", "");
-            line = String.format("Frame %s of %s | %s, %s speed", currentFrame, totalFrames, currentBitrate, currentSpeed);
-            return line;
-        }
-        return "No progress available.";
+//        clipItButton.setDisable(true);
     }
 
     private class progressUpdater extends AnimationTimer{
@@ -108,7 +95,7 @@ public class CompatabilityatorView implements PopOut {
             }catch (IOException ignored){}
             if (line != null) {
                 ffmpegOutput.appendText(line + "\n");
-                progressText.setText(getFFMPEGProgress(line));
+                progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, totalDuration, fps, totalFrames, progressBar));
             }
             if (!clipper.isAlive()) {
                 if (clipper.exitValue() != 0) {
@@ -134,45 +121,67 @@ public class CompatabilityatorView implements PopOut {
         }
     }
 
-    private String checkHWACCEL(){
-        return checkHWACCEL(EncoderCheck.Encoders.h264_nvenc);
-    }
-
     @SuppressWarnings("unchecked")
-    private String checkHWACCEL(EncoderCheck.Encoders preferredEncoder) {
-        ArrayList<EncoderCheck.Encoders> encoders = EncoderCheck.getEncoders();
-        String command;
-        if (encoders.contains(EncoderCheck.Encoders.h264_nvenc)) {
-            command = "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+    private void checkHWACCEL() {
+        ArrayList<EncoderCheck.Encoder> encoders = EncoderCheck.getEncoders();
+        if (encoders.contains(EncoderCheck.Encoder.h264_nvenc)) {
             typeBox.getSelectionModel().select("h264_nvenc");
-        } else if (encoders.contains(EncoderCheck.Encoders.h264_amf)) {
-            command = "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality speed -b:a 128k -y \"%s\"";
+        } else if (encoders.contains(EncoderCheck.Encoder.h264_amf)) {
             typeBox.getSelectionModel().select("h264_amf");
-        }else if (encoders.contains(EncoderCheck.Encoders.libx264)) {
-            command = "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -crf:v 25 -b:a 128k -y \"%s\"";
+        }else if (encoders.contains(EncoderCheck.Encoder.libx264)) {
             typeBox.getSelectionModel().select("libx264");
         } else {
+            throw new IllegalStateException("No encoder found.");
+        }
+    }
+
+    private String selectHWACCEL(){
+        String command;
+        if (typeBox.getSelectionModel().getSelectedItem().equals("h264_nvenc")) {
+            command = "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+        }else if (typeBox.getSelectionModel().getSelectedItem().equals("h264_amf")) {
+            command = "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality speed -b:a 128k -y \"%s\"";
+        }else if (typeBox.getSelectionModel().getSelectedItem().equals("libx264")) {
+            command = "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -crf:v 25 -b:a 128k -y \"%s\"";
+        }else{
             throw new IllegalStateException("No encoder found.");
         }
         return command;
     }
 
-    public void clipIt() throws IOException{
+    protected double calcFrameRate(String ffprobeOutput) {
+        if (ffprobeOutput == null) return 30f;
+        String[] sections = ffprobeOutput.split("/");
+        return (double) Integer.parseInt(sections[0]) / (double) Integer.parseInt(sections[1]);
+    }
+
+    public void clipIt() throws IOException, InterruptedException {
         if (clipping){
+            FFmpegWrapper.killProcess(clipper);
+            clipping=false;
             return;
         }
-        System.out.println("Making clip shit n stuff...");
         swapVisibility();
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+
         String fileName = pathBox.getText();
         String fileSaveName = nameBox.getText();
-        String command = String.format(checkHWACCEL(),
+
+        ffmpegOutput.appendText("Starting conversion...\nCalculating duration and framerate...\n");
+        String probe_command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + fileName + "\"";
+        fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(probe_command));
+        ffmpegOutput.appendText("Calculated framerate: " + fps + "\n");
+        probe_command = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"" + fileName + "\"";
+        this.totalDuration = Double.parseDouble(StreamedCommand.getCommandOutput(probe_command));
+        ffmpegOutput.appendText("Calculated duration: " + totalDuration + "\n");
+        this.totalFrames = (int) (fps * totalDuration);
+        ffmpegOutput.appendText("Calculated total frames: " + totalFrames + "\n");
+        String command = String.format(selectHWACCEL(),
                 fileName, fileSaveName);
         clipper = StreamedCommand.runCommand(command);
         new progressUpdater(clipper).start();
         clipping = true;
         clipItButton.setText("Abort");
-        // TODO: GIANT GREEN CHECK MARK BABYYY WHOOOOOOOOOOO - Nick
     }
 
 
@@ -195,13 +204,14 @@ public class CompatabilityatorView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI) throws IOException{
+    public void passObjects(TextField VideoURI) throws IOException, InterruptedException {
 
         this.VideoURI = VideoURI;
         this.closeHook(this.pain);
         pathBox.setDisable(true);
         nameBox.setDisable(true);
         typeBox.setDisable(true);
+        checkHWACCEL();
         typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
         fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Advanced Formats",
@@ -230,11 +240,10 @@ public class CompatabilityatorView implements PopOut {
     @Override
     public boolean close() {
         if (clipper.isAlive()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Clip in progress");
-            alert.setHeaderText("Can't close while conversion is in progress.");
-            alert.setContentText("Please wait until conversion is complete.");
-            alert.show();
+            try{FFmpegWrapper.killProcess(clipper);}catch (Exception ignored){}
+            if(clipper.isAlive()) return false;
+        }
+        if (fileChooser != null) {
             return false;
         }
         ((Stage) pain.getScene().getWindow()).close();
@@ -248,17 +257,11 @@ public class CompatabilityatorView implements PopOut {
 
     private void onClose(WindowEvent event) throws IllegalStateException {
         if (clipper.isAlive()) {
+            try{FFmpegWrapper.killProcess(clipper);}catch (Exception ignored){}
             event.consume();
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Clip in progress");
-            alert.setHeaderText("Can't close while conversion is in progress.");
-            alert.setContentText("Please wait until conversion is complete.");
-            alert.showAndWait();
-            throw new IllegalStateException("PopOut close is not allowed while a conversion is in progress.");
         }
         if (fileChooser != null) {
             event.consume();
-            throw new IllegalStateException("PopOut close is not allowed while a file chooser is open.");
         }
         System.out.println("Window closed.");
         this.isAlive = false;

@@ -14,13 +14,13 @@
       <ProgressBar fx:id="progressBar" layoutX="78.0" layoutY="359.0" prefHeight="18.0" prefWidth="443.0" progress="0.0" visible="false" />
       <TextArea fx:id="ffmpegOutput" editable="false" layoutX="34.0" layoutY="14.0" prefHeight="211.0" prefWidth="536.0" />
       <TextField fx:id="nameBox" layoutX="97.0" layoutY="293.0" prefHeight="26.0" prefWidth="254.0" promptText="Set filename" />
-      <ChoiceBox fx:id="presetBox" layoutX="351.0" layoutY="293.0" prefHeight="26.0" prefWidth="110.0" />
+      <ChoiceBox fx:id="presetBox" layoutX="351.0" layoutY="293.0" prefHeight="26.0" prefWidth="141.0" />
       <TextField fx:id="pathBox" layoutX="97.0" layoutY="255.0" onMouseClicked="#openExplorer" prefHeight="26.0" prefWidth="475.0" promptText="Set path" />
       <Button fx:id="clipItButton" layoutX="274.0" layoutY="324.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip it!" />
       <Text fx:id="progressText" layoutX="37.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" wrappingWidth="529.5999938964844" />
       <CheckBox fx:id="sizeCap" layoutX="351.0" layoutY="327.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="163.0" text="Allow 100MB" />
       <Text layoutX="64.0" layoutY="273.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Path:" wrappingWidth="28.6851806640625" />
       <Text layoutX="37.0" layoutY="310.0" strokeType="OUTSIDE" strokeWidth="0.0" text="File name:" />
-      <ChoiceBox fx:id="videoSizeSelect" layoutX="460.0" layoutY="293.0" prefHeight="26.0" prefWidth="110.0" />
+      <ChoiceBox fx:id="videoSizeSelect" layoutX="493.0" layoutY="293.0" prefHeight="26.0" prefWidth="77.0" />
    </children>
 </AnchorPane>

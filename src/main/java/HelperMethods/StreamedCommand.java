@@ -50,12 +50,22 @@ public class StreamedCommand {
         return process.exitValue();
     }
 
-    public static int waitForExit(Process process, int timeout) throws IOException, TimeoutException {
+    public static int throwForExit(Process process, int timeout) throws IOException, TimeoutException {
         long start = System.currentTimeMillis();
         long end = start + timeout * 1000L;
         while(process.isAlive()){
             if(System.currentTimeMillis() > end) {
                 throw new TimeoutException(process.toString() + " wait for exit timed out");
+            }
+        }
+        return process.exitValue();
+    }
+    public static int waitForExit(Process process, int timeout) throws IOException {
+        long start = System.currentTimeMillis();
+        long end = start + timeout * 1000L;
+        while(process.isAlive()){
+            if(System.currentTimeMillis() > end) {
+                return Integer.MIN_VALUE;
             }
         }
         return process.exitValue();

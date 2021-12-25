@@ -36,9 +36,30 @@ public class SettingsWrapper {
         templateJSON = new JSONObject(jsonString.toString());
     }
 
-    private static String repairSettings(String badKey){
+    private static String repairSettingsString(String badKey){
         settingsJSON.put(badKey, templateJSON.getString(badKey));
         return templateJSON.getString(badKey);
+    }
+
+    private static boolean repairSettingsBoolean(String badKey){
+        settingsJSON.put(badKey, templateJSON.getBoolean(badKey));
+        return templateJSON.getBoolean(badKey);
+    }
+
+    public static String getSettingsValue(String key) {
+        try {
+            return settingsJSON.getString(key);
+        } catch (JSONException e) {
+            return repairSettingsString(key);
+        }
+    }
+
+    public static boolean getSettingsBoolean(String key) {
+        try {
+            return settingsJSON.getBoolean(key);
+        } catch (JSONException e) {
+            return repairSettingsBoolean(key);
+        }
     }
 
     public static String getBasicLoadPath(){
@@ -46,7 +67,7 @@ public class SettingsWrapper {
             return settingsJSON.getString("defaultBasicLoadPath");
         }
         catch (JSONException e){
-            return repairSettings("defaultBasicLoadPath");
+            return repairSettingsString("defaultBasicLoadPath");
         }
     }
 
@@ -55,7 +76,7 @@ public class SettingsWrapper {
             return settingsJSON.getString("defaultBasicSavePath");
         }
         catch (JSONException e){
-            return repairSettings("defaultBasicSavePath");
+            return repairSettingsString("defaultBasicSavePath");
         }
     }
 
@@ -64,7 +85,7 @@ public class SettingsWrapper {
             return settingsJSON.getString("defaultAdvancedLoadPath");
         }
         catch (JSONException e){
-            return repairSettings("defaultAdvancedLoadPath");
+            return repairSettingsString("defaultAdvancedLoadPath");
         }
     }
 
@@ -73,7 +94,7 @@ public class SettingsWrapper {
             return settingsJSON.getString("defaultAdvancedSavePath");
         }
         catch (JSONException e){
-            return repairSettings("defaultAdvancedSavePath");
+            return repairSettingsString("defaultAdvancedSavePath");
         }
     }
 
@@ -82,7 +103,7 @@ public class SettingsWrapper {
             return settingsJSON.getString("defaultYoutubeSavePath");
         }
         catch (JSONException e){
-            return repairSettings("defaultYoutubeSavePath");
+            return repairSettingsString("defaultYoutubeSavePath");
         }
     }
 }
