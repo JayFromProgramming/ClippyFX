@@ -123,12 +123,12 @@ public class CompatabilityatorView implements PopOut {
 
     @SuppressWarnings("unchecked")
     private void checkHWACCEL() {
-        ArrayList<EncoderCheck.Encoder> encoders = EncoderCheck.getEncoders();
-        if (encoders.contains(EncoderCheck.Encoder.h264_nvenc)) {
+        ArrayList<EncoderCheck.Encoders> encoders = EncoderCheck.getEncoders();
+        if (encoders.contains(EncoderCheck.Encoders.h264_nvenc)) {
             typeBox.getSelectionModel().select("h264_nvenc");
-        } else if (encoders.contains(EncoderCheck.Encoder.h264_amf)) {
+        } else if (encoders.contains(EncoderCheck.Encoders.h264_amf)) {
             typeBox.getSelectionModel().select("h264_amf");
-        }else if (encoders.contains(EncoderCheck.Encoder.libx264)) {
+        }else if (encoders.contains(EncoderCheck.Encoders.libx264)) {
             typeBox.getSelectionModel().select("libx264");
         } else {
             throw new IllegalStateException("No encoder found.");

@@ -3,10 +3,7 @@ package HelperMethods;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 
 public class SettingsWrapper {
@@ -36,6 +33,19 @@ public class SettingsWrapper {
         templateJSON = new JSONObject(jsonString.toString());
     }
 
+    private static void saveSettings() {
+        try {
+            FileWriter writer = new FileWriter(settingsFile);
+            writer.write(settingsJSON.toString());
+            writer.close();
+        }catch (IOException ignored){}
+    }
+
+    private static void updateSetting(String key, String value){
+        settingsJSON.put(key, value);
+        saveSettings();
+    }
+
     private static String repairSettingsString(String badKey){
         settingsJSON.put(badKey, templateJSON.getString(badKey));
         return templateJSON.getString(badKey);
@@ -46,7 +56,7 @@ public class SettingsWrapper {
         return templateJSON.getBoolean(badKey);
     }
 
-    public static String getSettingsValue(String key) {
+    public static String getSettingsString(String key) {
         try {
             return settingsJSON.getString(key);
         } catch (JSONException e) {
