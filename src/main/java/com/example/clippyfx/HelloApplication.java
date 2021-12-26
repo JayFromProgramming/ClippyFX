@@ -5,6 +5,7 @@ import HelperMethods.SettingsWrapper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -16,7 +17,13 @@ import java.nio.file.Path;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("ClippyFX");
+        alert.setHeaderText("Checking for encoders");
+        alert.setContentText("Checking for encoders...");
+        alert.show();
         EncoderCheck.checkEncoders();
+        alert.close();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");

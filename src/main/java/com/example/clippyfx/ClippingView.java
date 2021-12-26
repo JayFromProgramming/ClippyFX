@@ -181,16 +181,16 @@ public class ClippingView implements PopOut {
         this.fps = fps;
         this.presetSelector = presetSelector;
         this.uri = videoURI;
-        this.pathBox.setText(SettingsWrapper.getBasicSavePath());
+        this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
 
         this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
                 clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
 
-        this.sizeCap.setSelected(SettingsWrapper.getSettingsBoolean("defaultAllow100MB"));
+        this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
         presetBox.setItems(FXCollections.observableArrayList(EncoderCheck.getEncodersString()));
         videoSizeSelect.setItems(FXCollections.observableArrayList(EncoderCheck.getAllowedSizesString()));
-        presetBox.setValue(SettingsWrapper.getSettingsString("preferredOutputEncoder"));
-        videoSizeSelect.setValue(SettingsWrapper.getSettingsString("preferredVideoSize"));
+        presetBox.setValue(SettingsWrapper.getSetting("preferredOutputEncoder").value);
+        videoSizeSelect.setValue(SettingsWrapper.getSetting("preferredVideoSize").value);
         fpsSelect.setText(String.valueOf(fps));
     }
 
@@ -206,7 +206,7 @@ public class ClippingView implements PopOut {
 
     @Override
     public boolean close() {
-        if (clipper.isAlive()) {
+        if (clipper != null && clipper.isAlive()) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Clip in progress");
             alert.setHeaderText("Can't close while clipping is in progress.");
@@ -225,7 +225,7 @@ public class ClippingView implements PopOut {
     }
 
     private void onClose(WindowEvent event) {
-        if (clipper.isAlive()) {
+        if (clipper != null && clipper.isAlive()) {
             event.consume();
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Clip in progress");

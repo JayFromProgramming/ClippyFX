@@ -43,15 +43,41 @@ public class EncoderCheck {
 
     public static ArrayList<String> getAllowedSizesString(){
         ArrayList<String> sizes = new ArrayList<>(9);
+        for (Sizes size : AVAILABLE_SIZES) {
+            if (size != Sizes.Source) {
+                sizes.add(size.toString().substring(1));
+            }else sizes.add(size.toString());
+        }
+        return sizes;
+    }
+
+    public static ArrayList<String> getSizesString(){
+        ArrayList<String> sizes = new ArrayList<>(9);
         for (Sizes size : Sizes.values()) {
             sizes.add(size.toString());
         }
         return sizes;
     }
 
-//    public static ArrayList<Sizes> getAllowedSizes(File file) throws IOException {
-//
-//    }
+    public static void checkAllowedSizes(File file) throws IOException {
+        AVAILABLE_SIZES.clear();
+        AVAILABLE_SIZES.add(Sizes.Source);
+        System.out.println("Detecting allowed sizes...");
+        String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i " + file.getAbsolutePath());
+        if (hSize.equals("")) {
+            System.out.println("Failed to detect allowed sizes.\n Reason: Failed to get video height.");
+        } else {
+            int height = Integer.parseInt(hSize);
+            if (height >= 2160) {AVAILABLE_SIZES.add(Sizes.x2160p); System.out.println("x2160p available");}
+            if (height >= 1440) {AVAILABLE_SIZES.add(Sizes.x1440p); System.out.println("x1440p available");}
+            if (height >= 1080) {AVAILABLE_SIZES.add(Sizes.x1080p); System.out.println("x1080p available");}
+            if (height >= 720) {AVAILABLE_SIZES.add(Sizes.x720p); System.out.println("x720p available");}
+            if (height >= 480) {AVAILABLE_SIZES.add(Sizes.x480p); System.out.println("x480p available");}
+            if (height >= 360) {AVAILABLE_SIZES.add(Sizes.x360p); System.out.println("x360p available");}
+            if (height >= 240) {AVAILABLE_SIZES.add(Sizes.x240p); System.out.println("x240p available");}
+            if (height >= 144) {AVAILABLE_SIZES.add(Sizes.x144p); System.out.println("x144p available");}
+        }
+    }
 
     public static void checkEncoders() {
         AVAILABLE_ENCODERS.clear();

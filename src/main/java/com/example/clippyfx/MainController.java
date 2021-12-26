@@ -160,28 +160,6 @@ public class MainController {
         }
     }
 
-
-    public void loadFileOption(MouseEvent mouseEvent) {
-        fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Video Files",
-                "*.mp4", "*.avi", "*.mov"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MP4 Files", "*.mp4"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("AVI Files", "*.avi"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("MOV Files", "*.mov"));
-        fileChooser.setTitle("Choose a file to clip");
-        fileChooser.setInitialDirectory(new java.io.File(SettingsWrapper.getBasicLoadPath()));
-        java.io.File file = fileChooser.showOpenDialog(Pain.getScene().getWindow());
-        if (file != null) {
-            VideoURI.setText(file.toURI().toString());
-        }
-    }
-
-    public void loadLinkOption(MouseEvent mouseEvent) {
-        String link = VideoURI.getText();
-        // Get URI from ffmpeg <--- look at this duuuude
-
-    }
-
     public void scrubPressed(MouseEvent mouseEvent) {
         mediaPlayer.pause();
         scrubbing = true;
@@ -302,5 +280,26 @@ public class MainController {
         }
         alert.setContentText(sb.toString());
         alert.showAndWait();
+    }
+
+    public void openSettings(MouseEvent mouseEvent) throws IOException {
+        popOuts.removeIf(popOut -> !popOut.isAlive());
+        for (PopOut popOut : popOuts) {
+            if (popOut.getType() == PopOut.popOutType.SettingsView) {
+                if (popOut.isAlive()) {
+                    popOut.getWindow().requestFocus();
+                    return;
+                }
+            }
+        }
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("settings-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Open settings");
+        stage.setScene(scene);
+        stage.show();
+        SettingsView controller = fxmlLoader.getController();
+        popOuts.add(controller);
+        controller.initialize();
     }
 }

@@ -136,17 +136,12 @@ public class CompatabilityatorView implements PopOut {
     }
 
     private String selectHWACCEL(){
-        String command;
-        if (typeBox.getSelectionModel().getSelectedItem().equals("h264_nvenc")) {
-            command = "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
-        }else if (typeBox.getSelectionModel().getSelectedItem().equals("h264_amf")) {
-            command = "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality speed -b:a 128k -y \"%s\"";
-        }else if (typeBox.getSelectionModel().getSelectedItem().equals("libx264")) {
-            command = "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -crf:v 25 -b:a 128k -y \"%s\"";
-        }else{
-            throw new IllegalStateException("No encoder found.");
-        }
-        return command;
+        return switch (typeBox.getSelectionModel().getSelectedItem().toString()) {
+            case "h264_nvenc" -> "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+            case "h264_amf" -> "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+            case "libx264" -> "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+            default -> throw new IllegalStateException("Unexpected value: " + typeBox.getSelectionModel().getSelectedItem());
+        };
     }
 
     protected double calcFrameRate(String ffprobeOutput) {
@@ -155,7 +150,7 @@ public class CompatabilityatorView implements PopOut {
         return (double) Integer.parseInt(sections[0]) / (double) Integer.parseInt(sections[1]);
     }
 
-    public void clipIt() throws IOException, InterruptedException {
+    public void convertIt() throws IOException, InterruptedException {
         if (clipping){
             FFmpegWrapper.killProcess(clipper);
             clipping=false;
@@ -214,17 +209,36 @@ public class CompatabilityatorView implements PopOut {
         checkHWACCEL();
         typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
         fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Video Files",
+                "*.mp4", "*.avi", "*.mkv", "*.mov", "*.webm", "*.flv", "*.wmv", "*.mpg", "*.mpeg", "*.m4v",
+                "*.mxf", "*.rm", "*.rmvb", "*.ogv", "*.ogm", "*.3gp", "*.3g2", "*.m2ts", "*.mts", "*.ts"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Advanced Formats",
                 "*.webm", "*.mkv", "*.mov"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Supported Formats",
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Basic Formats",
                 "*.mp4", "*.avi", "*.mov"));
-        fileChooser.setInitialDirectory(new File(SettingsWrapper.getAdvancedLoadPath()));
+        fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
         java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
+        fileChooser = null;
         if (file != null) {
-            pathBox.setText(file.getAbsolutePath());
-            nameBox.setText("src/main/resources/videoResources/TempWorkingFile.mp4");
+            ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
+            ffmpegOutput.appendText("Calculating duration and framerate...\n");
+            EncoderCheck.checkAllowedSizes(file);
+            // Check if the file is a supported encoding
+            String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
+            if (encoding.equals("h264")) {
+                // If it is, bypass the file conversion and just set the video URI
+                VideoURI.setText(file.toURI().toString());
+                ((Stage) pain.getScene().getWindow()).close();
+            }else{
+                // If not, convert it to a supported encoding
+                pathBox.setText(file.getAbsolutePath());
+                nameBox.setText("src/main/resources/videoResources/TempWorkingFile.mp4");
+                convertIt();
+            }
+        } else {
+            ffmpegOutput.appendText("No file selected.\n");
+            ((Stage) pain.getScene().getWindow()).close();
         }
-        clipIt();
     }
 
     @Override
@@ -239,7 +253,7 @@ public class CompatabilityatorView implements PopOut {
 
     @Override
     public boolean close() {
-        if (clipper.isAlive()) {
+        if (clipper != null && clipper.isAlive()) {
             try{FFmpegWrapper.killProcess(clipper);}catch (Exception ignored){}
             if(clipper.isAlive()) return false;
         }
@@ -256,7 +270,7 @@ public class CompatabilityatorView implements PopOut {
     }
 
     private void onClose(WindowEvent event) throws IllegalStateException {
-        if (clipper.isAlive()) {
+        if (clipper != null && clipper.isAlive()) {
             try{FFmpegWrapper.killProcess(clipper);}catch (Exception ignored){}
             event.consume();
         }

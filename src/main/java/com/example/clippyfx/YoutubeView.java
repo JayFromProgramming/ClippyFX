@@ -109,7 +109,8 @@ public class YoutubeView implements PopOut {
         int hours = totalSecs / 3600;
         int minutes = (totalSecs % 3600) / 60;
         int seconds = totalSecs % 60;
-        String info = String.format("Resolution: %s\nFramerate: %s fps\nUploaded by: %s\nUploaded on: %s\nLength: %s\nView Count: %s\nLike count: %s\nAge limit: %s\n\nDescription: %s",
+        String info = String.format("Resolution: %s\nFramerate: %s fps\nUploaded by: %s\nUploaded on: %s\nLength: %s\n" +
+                        "View Count: %s\nLike count: %s\nDislike count: At least 1\nAge limit: %s\n\nDescription: %s",
                 this.json.getString("resolution"),
                 this.json.getInt("fps"),
                 this.json.getString("uploader"),

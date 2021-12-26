@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 public class SettingsWrapper {
@@ -14,6 +15,29 @@ public class SettingsWrapper {
     private static JSONObject templateJSON;
     static File settingsFile = new File(SETTINGS_FILE_NAME);
     static File templateFile = new File(TEMPLATE_FILE_PATH);
+
+
+    public static class setting{
+        public String name;
+        public String value;
+        public String type;
+        public String description;
+
+        setting(JSONObject jsonObject){
+            try {
+                this.name = jsonObject.getString("name");
+                this.value = jsonObject.getString("value");
+                this.type = jsonObject.getString("type");
+                this.description = jsonObject.getString("description");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public boolean bool(){
+            return Boolean.parseBoolean(value);
+        }
+    }
 
     public static void loadSettings() throws IOException {
         settingsJSON = new JSONObject();
@@ -46,74 +70,28 @@ public class SettingsWrapper {
         saveSettings();
     }
 
-    private static String repairSettingsString(String badKey){
-        settingsJSON.put(badKey, templateJSON.getString(badKey));
-        return templateJSON.getString(badKey);
+    public static ArrayList<setting> getAllSettings() {
+        ArrayList<setting> settings = new ArrayList<>();
+        for (String key : templateJSON.keySet()) {
+            try {
+                settings.add(new setting(settingsJSON.getJSONObject(key)));
+            } catch (JSONException e) {
+                settings.add(repairSetting(key));
+            }
+        }
+        return settings;
     }
 
-    private static boolean repairSettingsBoolean(String badKey){
-        settingsJSON.put(badKey, templateJSON.getBoolean(badKey));
-        return templateJSON.getBoolean(badKey);
+    private static setting repairSetting(String badKey){
+        settingsJSON.put(badKey, templateJSON.getJSONObject(badKey));
+        return new setting(templateJSON.getJSONObject(badKey));
     }
 
-    public static String getSettingsString(String key) {
+    public static setting getSetting(String key) {
         try {
-            return settingsJSON.getString(key);
+            return new setting(settingsJSON.getJSONObject(key));
         } catch (JSONException e) {
-            return repairSettingsString(key);
-        }
-    }
-
-    public static boolean getSettingsBoolean(String key) {
-        try {
-            return settingsJSON.getBoolean(key);
-        } catch (JSONException e) {
-            return repairSettingsBoolean(key);
-        }
-    }
-
-    public static String getBasicLoadPath(){
-        try{
-            return settingsJSON.getString("defaultBasicLoadPath");
-        }
-        catch (JSONException e){
-            return repairSettingsString("defaultBasicLoadPath");
-        }
-    }
-
-    public static String getBasicSavePath(){
-        try{
-            return settingsJSON.getString("defaultBasicSavePath");
-        }
-        catch (JSONException e){
-            return repairSettingsString("defaultBasicSavePath");
-        }
-    }
-
-    public static String getAdvancedLoadPath(){
-        try{
-            return settingsJSON.getString("defaultAdvancedLoadPath");
-        }
-        catch (JSONException e){
-            return repairSettingsString("defaultAdvancedLoadPath");
-        }
-    }
-
-    public static String getAdvancedSavePath(){
-        try{
-            return settingsJSON.getString("defaultAdvancedSavePath");
-        }
-        catch (JSONException e){
-            return repairSettingsString("defaultAdvancedSavePath");
-        }
-    }
-
-    public static String getYoutubeSavePath(){
-        try{
-            return settingsJSON.getString("defaultYoutubeSavePath");
-        }
-        catch (JSONException e){
-            return repairSettingsString("defaultYoutubeSavePath");
+            return repairSetting(key);
         }
     }
 }

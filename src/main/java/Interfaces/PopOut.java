@@ -11,7 +11,8 @@ public interface PopOut {
     enum popOutType {
         ClippingView,
         ConverterView,
-        YoutubeFinderView
+        YoutubeFinderView,
+        SettingsView
     }
 
     /**
