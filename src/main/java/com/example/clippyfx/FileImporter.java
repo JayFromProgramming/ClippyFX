@@ -1,9 +1,13 @@
 package com.example.clippyfx;
 
+import EncodingMagic.FilePegGenerator;
 import HelperMethods.EncoderCheck;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
+import Interfaces.MediaSelector;
+import Interfaces.Method;
+import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
@@ -23,7 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class CompatabilityatorView implements PopOut {
+public class FileImporter implements PopOut {
 
     public ProgressBar progressBar;
     public TextArea ffmpegOutput;
@@ -52,8 +56,9 @@ public class CompatabilityatorView implements PopOut {
     private TextArea youtubeData;
     private JSONArray videoURIs;
     private FileChooser fileChooser;
+    private Method finishMethod;
 
-    public CompatabilityatorView() {
+    public FileImporter() {
 
     }
 
@@ -70,6 +75,12 @@ public class CompatabilityatorView implements PopOut {
         enableMP4.setSelected(true);
         progressBar.setVisible(true);
 //        clipItButton.setDisable(true);
+    }
+
+    private PegGenerator getPegGenerator() {
+        PegGenerator pegGenerator = new FilePegGenerator();
+        pegGenerator.setVideo(VideoURI.getText());
+        return pegGenerator;
     }
 
     private class progressUpdater extends AnimationTimer{
@@ -114,10 +125,12 @@ public class CompatabilityatorView implements PopOut {
                     typeBox.setDisable(false);
                 } else {
                     stop();
-                    finish();
+                    try {
+                        finish();
+                    } catch (IOException ignored) {}
                 }
-                stop();
             }
+            stop();
         }
     }
 
@@ -180,7 +193,7 @@ public class CompatabilityatorView implements PopOut {
     }
 
 
-    private void finish(){
+    private void finish() throws IOException {
         clipping = false;
         progressBar.setProgress(1);
         File temp = new File(nameBox.getText());
@@ -192,6 +205,7 @@ public class CompatabilityatorView implements PopOut {
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
             ((Stage) pain.getScene().getWindow()).close();
+            this.finishMethod.execute(this.getPegGenerator());
         } else {
             ffmpegOutput.appendText("Conversion failed unable to find output file.");
             System.out.println("Conversion failed unable to find output file.");
@@ -199,9 +213,10 @@ public class CompatabilityatorView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI) throws IOException, InterruptedException {
+    public void passObjects(TextField VideoURI, Method execute) throws IOException, InterruptedException {
 
         this.VideoURI = VideoURI;
+        this.finishMethod = execute;
         this.closeHook(this.pain);
         pathBox.setDisable(true);
         nameBox.setDisable(true);
@@ -229,6 +244,7 @@ public class CompatabilityatorView implements PopOut {
                 // If it is, bypass the file conversion and just set the video URI
                 VideoURI.setText(file.toURI().toString());
                 ((Stage) pain.getScene().getWindow()).close();
+                this.finishMethod.execute(this.getPegGenerator());
             }else{
                 // If not, convert it to a supported encoding
                 pathBox.setText(file.getAbsolutePath());

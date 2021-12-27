@@ -1,5 +1,8 @@
 package com.example.clippyfx;
 
+import EncodingMagic.YoutubePegGenerator;
+import Interfaces.Method;
+import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.application.Platform;
 import javafx.scene.control.*;
@@ -20,6 +23,7 @@ import org.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 public class YoutubeView implements PopOut {
 
@@ -37,13 +41,17 @@ public class YoutubeView implements PopOut {
     private String mainURI;
     private JSONObject json;
     private String thumbnailURI;
-    private JSONArray videoURIs;
-    private TextArea youtubeData;
+    private Method finishMethod;
 
-    public void passObjects(TextField videoURI, JSONArray videoURIs, TextArea isYoutube){ // Behaves like a constructor
+    private PegGenerator getPegGenerator(){
+      PegGenerator pegGenerator = new YoutubePegGenerator();
+      pegGenerator.setVideo(this.json);
+      return pegGenerator;
+    }
+
+    public void passObjects(TextField videoURI, Method finishMethod){ // Behaves like a constructor
         this.videoURI = videoURI;
-        this.videoURIs = videoURIs;
-        this.youtubeData = isYoutube;
+        this.finishMethod = finishMethod;
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         this.closeHook(this.pane);
     }
@@ -123,10 +131,9 @@ public class YoutubeView implements PopOut {
         videoInfo.setText(info);
     }
 
-    public void submitURI(MouseEvent mouseEvent) {
+    public void submitURI(MouseEvent mouseEvent) throws IOException {
         videoURI.setText(mainURI);
-        videoURIs = this.json.getJSONArray("formats");
-        youtubeData.setText(this.json.toString());
+        finishMethod.execute(this.getPegGenerator());
         ((Stage) pane.getScene().getWindow()).close();
     }
 

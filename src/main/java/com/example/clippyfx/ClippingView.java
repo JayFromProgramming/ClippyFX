@@ -39,10 +39,10 @@ public class ClippingView implements PopOut {
     public TextField fpsSelect;
 
     private AnimationTimer timer;
-    public Slider clipStart;
+    public double clipStart;
     public MediaPlayer mediaPlayer;
     public TextField VideoURI;
-    public Slider clipEnd;
+    public double clipEnd;
 
     private float clippingRate = 0.0f;
     private int totalFrames = 0;
@@ -51,10 +51,8 @@ public class ClippingView implements PopOut {
     private ArrayList<String> splitList;
     private boolean clipping = false;
     private boolean isAlive = true;
-    private PegGenerator presetSelector;
+    private PegGenerator pegGenerator;
     private Process clipper;
-    private double startTime;
-    private double endTime;
 
     public ClippingView() {
 
@@ -100,20 +98,15 @@ public class ClippingView implements PopOut {
         @Override
         public void handle(long now) {
             String line = null;
-//            System.out.println("Reading");
             try {
-                if (reader.ready()) {
-                    line = reader.readLine();
-//                    System.out.println(line);
-                }
+                if (reader.ready()) line = reader.readLine();
             }catch (IOException ignored){}
             if (line != null) {
                 ffmpegOutput.appendText(line + "\n");
-                progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, endTime-startTime,
+                progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, clipEnd-clipStart,
                         fps, totalFrames, progressBar));
-                double pos = FFmpegWrapper.getPlaybackPercent((int) (startTime*fps),
+                double pos = FFmpegWrapper.getPlaybackPercent((int) (clipStart*fps),
                         (int) ((int) mediaPlayer.getTotalDuration().toSeconds() * fps));
-                System.out.println(pos);
                 new Thread(() -> mediaPlayer.seek(mediaPlayer.getMedia().getDuration().multiply(pos))).start();
 
             }
@@ -138,6 +131,18 @@ public class ClippingView implements PopOut {
         }
     }
 
+    private EncoderCheck.Encoders getEncoder() {
+        return EncoderCheck.Encoders.valueOf(presetBox.getValue().toString());
+    }
+
+    private EncoderCheck.Sizes getSize() {
+        if (videoSizeSelect.getValue().toString().equals("Source")) {
+            return EncoderCheck.Sizes.Source;
+        }else{
+            return EncoderCheck.Sizes.valueOf("x" + videoSizeSelect.getValue().toString());
+        }
+    }
+
     public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
         if (clipping){
             FFmpegWrapper.killProcess(clipper);
@@ -150,16 +155,10 @@ public class ClippingView implements PopOut {
         System.out.println("Clipping...");
         swapVisibility();
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-        startTime = clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds();
-        endTime = clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds();
-        String fileName = uri.getText();
-        if (fileName.contains("file:")) {
-            fileName = fileName.substring(6);
-        }
         String fileSaveName = pathBox.getText() + "\\" + nameBox.getText();
-        if (startTime > endTime) throw new IllegalArgumentException("Start time cannot be greater than end time.");
-        String command = String.format("ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libvpx-vp9 -c:a libopus -b:v 1500k -b:a 128k -y \"%s.webm\"",
-                startTime, fileName, endTime - startTime, fileSaveName);
+        if (clipStart > clipEnd) throw new IllegalArgumentException("Start time cannot be greater than end time.");
+        String command = pegGenerator.buildPeg(this.getEncoder(), this.getSize(), this.sizeCap.isSelected(),
+                Double.parseDouble(this.fpsSelect.getText()), fileSaveName);
         System.out.println(command);
         ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
         builder.redirectErrorStream(true);
@@ -171,20 +170,16 @@ public class ClippingView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(MediaPlayer mediaPlayer, Slider clipStart, Slider clipEnd, TextField VideoURI, float fps,
-                            PegGenerator presetSelector, TextField videoURI) {
+    public void passObjects(MediaPlayer mediaPlayer, PegGenerator pegGenerator) {
         closeHook(this.pain);
-        this.mediaPlayer = mediaPlayer;
-        this.clipStart = clipStart;
-        this.clipEnd = clipEnd;
-        this.VideoURI = VideoURI;
-        this.fps = fps;
-        this.presetSelector = presetSelector;
-        this.uri = videoURI;
-        this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
 
-        this.totalFrames = (int) ((clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds() -
-                clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()) * fps);
+        this.mediaPlayer = mediaPlayer;
+        this.clipStart = pegGenerator.getStartTime();
+        this.clipEnd = pegGenerator.getEndTime();
+        this.fps = (float) pegGenerator.getFPS();
+        this.pegGenerator = pegGenerator;
+        this.totalFrames = (int) pegGenerator.getTotalClipFrames();
+        this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
         presetBox.setItems(FXCollections.observableArrayList(EncoderCheck.getEncodersString()));

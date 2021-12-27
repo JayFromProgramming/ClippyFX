@@ -1,8 +1,8 @@
 package com.example.clippyfx;
 
 import EncodingMagic.FilePegGenerator;
-import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
+import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.fxml.FXML;
@@ -22,13 +22,9 @@ import javafx.animation.AnimationTimer;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.stage.Stage;
-import org.json.JSONArray;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 
@@ -57,13 +53,12 @@ public class MainController {
     public Button clipItButton;
     public Button vp9LoadButton;
     public Button ejectButton;
-    public TextArea youtubeData;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
     private float fps = 30;
-    public JSONArray videoURIs;
-    public ArrayList<PopOut> popOuts = new ArrayList<>();
+    private ArrayList<PopOut> popOuts = new ArrayList<>();
+    private PegGenerator pegGenerator;
 
     public void onClose(WindowEvent event) {
         for (PopOut popOut : popOuts) {
@@ -75,8 +70,13 @@ public class MainController {
     }
 
     @FXML
-    protected void onMediaLoad() throws IOException {
+    protected void onMediaLoad(MouseEvent ignored) throws IOException {
+        loadMedia(new FilePegGenerator());
+    }
+
+    protected void loadMedia(PegGenerator pegGenerator) throws IOException {
         System.out.println("Media loading...");
+        this.pegGenerator = pegGenerator;
         Media media = new Media(VideoURI.getText());
         mediaPlayer = new MediaPlayer(media);
         clipEnd.setValue(100);
@@ -107,14 +107,12 @@ public class MainController {
             }
         };
         timer.start();
-        if (!youtubeData.getText().equals("")){
+        if (pegGenerator.TYPE == PegGenerator.PegType.Youtube) {
             fps = 30;
         } else {
             String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + VideoURI.getText().substring(6) + "\"";
             fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         }
-
-
         System.out.println("FPS: " + fps);
         setEnabledUI(true);
         System.out.println("Media loaded.");
@@ -205,19 +203,21 @@ public class MainController {
 
     public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
         // ffmpeg -ss {startTime} -i '{file/URI}' -c:v libvpx-vp9
-        System.out.println(youtubeData);
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("clipping-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX Clipping");
         stage.setScene(scene);
         stage.show();
+        double start = (clipStart.getValue() / 100) * mediaPlayer.getTotalDuration().toSeconds();
+        double end = (clipEnd.getValue() / 100) * mediaPlayer.getTotalDuration().toSeconds();
+        this.pegGenerator.loadClipBounds(start, end);
         ClippingView clippingProgressWindow = fxmlLoader.getController();
-        clippingProgressWindow.passObjects(mediaPlayer, clipStart, clipEnd, VideoURI, fps, new FilePegGenerator(),
-                VideoURI);
+        this.pegGenerator.passMetaData(this.fps, this.mediaPlayer.getTotalDuration().toSeconds());
+        clippingProgressWindow.passObjects(mediaPlayer, this.pegGenerator);
     }
 
-    public void loadVP9(MouseEvent mouseEvent) throws IOException, TimeoutException, InterruptedException {
+    public void loadFile(MouseEvent mouseEvent) throws IOException, TimeoutException, InterruptedException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
             if (popOut.getType() == PopOut.popOutType.ConverterView) {
@@ -233,9 +233,9 @@ public class MainController {
         stage.setTitle("ClippyFX: Advanced video loader");
         stage.setScene(scene);
         stage.show();
-        CompatabilityatorView compat = fxmlLoader.getController();
+        FileImporter compat = fxmlLoader.getController();
         popOuts.add(compat);
-        compat.passObjects(VideoURI);
+        compat.passObjects(VideoURI, new go());
     }
 
     public void loadYoutube(MouseEvent mouseEvent) throws IOException {
@@ -256,7 +256,7 @@ public class MainController {
         stage.show();
         YoutubeView youtubeSelectView = fxmlLoader.getController();
         popOuts.add(youtubeSelectView);
-        youtubeSelectView.passObjects(VideoURI, videoURIs, youtubeData);
+        youtubeSelectView.passObjects(VideoURI, new go());
     }
 
     public void onUncaughtException(Thread thread, Throwable throwable) {
@@ -302,4 +302,15 @@ public class MainController {
         popOuts.add(controller);
         controller.initialize();
     }
+
+    class go implements Method {
+
+        @Override
+        public void execute(Object data) throws IOException {
+            loadMedia((PegGenerator) data);
+        }
+
+    }
+
+
 }
