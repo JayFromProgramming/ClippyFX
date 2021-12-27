@@ -5,7 +5,6 @@ import HelperMethods.EncoderCheck;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
-import Interfaces.MediaSelector;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
@@ -27,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class FileImporter implements PopOut {
+public class ImporterView implements PopOut {
 
     public ProgressBar progressBar;
     public TextArea ffmpegOutput;
@@ -58,7 +57,7 @@ public class FileImporter implements PopOut {
     private FileChooser fileChooser;
     private Method finishMethod;
 
-    public FileImporter() {
+    public ImporterView() {
 
     }
 
@@ -103,7 +102,9 @@ public class FileImporter implements PopOut {
                     line = reader.readLine();
                     System.out.println(line);
                 }
-            }catch (IOException ignored){}
+            }catch (IOException e){
+                e.printStackTrace();
+            }
             if (line != null) {
                 ffmpegOutput.appendText(line + "\n");
                 progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, totalDuration, fps, totalFrames, progressBar));
@@ -123,6 +124,7 @@ public class FileImporter implements PopOut {
                     clipItButton.setDisable(false);
                     clipItButton.setText("Convert");
                     typeBox.setDisable(false);
+                    stop();
                 } else {
                     stop();
                     try {
@@ -130,7 +132,6 @@ public class FileImporter implements PopOut {
                     } catch (IOException ignored) {}
                 }
             }
-            stop();
         }
     }
 
@@ -170,8 +171,6 @@ public class FileImporter implements PopOut {
             return;
         }
         swapVisibility();
-        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-
         String fileName = pathBox.getText();
         String fileSaveName = nameBox.getText();
 
@@ -184,9 +183,10 @@ public class FileImporter implements PopOut {
         ffmpegOutput.appendText("Calculated duration: " + totalDuration + "\n");
         this.totalFrames = (int) (fps * totalDuration);
         ffmpegOutput.appendText("Calculated total frames: " + totalFrames + "\n");
-        String command = String.format(selectHWACCEL(),
-                fileName, fileSaveName);
+        String command = String.format(selectHWACCEL(), fileName, fileSaveName);
+        ffmpegOutput.appendText("Conversion command: " + command + "\n");
         clipper = StreamedCommand.runCommand(command);
+        ffmpegOutput.appendText("Command loaded, starting conversion.\n");
         new progressUpdater(clipper).start();
         clipping = true;
         clipItButton.setText("Abort");
@@ -221,6 +221,7 @@ public class FileImporter implements PopOut {
         pathBox.setDisable(true);
         nameBox.setDisable(true);
         typeBox.setDisable(true);
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         checkHWACCEL();
         typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
         fileChooser = new FileChooser();
@@ -236,10 +237,11 @@ public class FileImporter implements PopOut {
         fileChooser = null;
         if (file != null) {
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
-            ffmpegOutput.appendText("Calculating duration and framerate...\n");
+            ffmpegOutput.appendText("Determining encoding type\n");
             EncoderCheck.checkAllowedSizes(file);
             // Check if the file is a supported encoding
             String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
+            ffmpegOutput.appendText("Encoding type: " + encoding + "\n");
             if (encoding.equals("h264")) {
                 // If it is, bypass the file conversion and just set the video URI
                 VideoURI.setText(file.toURI().toString());

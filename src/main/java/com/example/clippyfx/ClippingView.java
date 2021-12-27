@@ -58,11 +58,6 @@ public class ClippingView implements PopOut {
 
     }
 
-    public void setProgress(double progress) {
-        progressBar.setProgress(progress);
-    }
-
-
     public void openExplorer(MouseEvent mouseEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Select a folder to save the clip to.");
@@ -100,7 +95,9 @@ public class ClippingView implements PopOut {
             String line = null;
             try {
                 if (reader.ready()) line = reader.readLine();
-            }catch (IOException ignored){}
+            }catch (IOException e){
+                e.printStackTrace();
+            }
             if (line != null) {
                 ffmpegOutput.appendText(line + "\n");
                 progressText.setText(FFmpegWrapper.getFFMPEGProgress(line, clipEnd-clipStart,

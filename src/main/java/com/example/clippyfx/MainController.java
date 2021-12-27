@@ -233,7 +233,7 @@ public class MainController {
         stage.setTitle("ClippyFX: Advanced video loader");
         stage.setScene(scene);
         stage.show();
-        FileImporter compat = fxmlLoader.getController();
+        ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
         compat.passObjects(VideoURI, new go());
     }
@@ -307,6 +307,7 @@ public class MainController {
 
         @Override
         public void execute(Object data) throws IOException {
+            Pain.getScene().getWindow().requestFocus();
             loadMedia((PegGenerator) data);
         }
 
