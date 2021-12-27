@@ -28,6 +28,7 @@ public class EncoderCheck {
 
     private static final ArrayList<Encoders> AVAILABLE_ENCODERS = new ArrayList<>(Encoders.values().length);
     private static final ArrayList<Sizes> AVAILABLE_SIZES = new ArrayList<>(Sizes.values().length);
+    private static int HEIGHT = 0;
 
     public static ArrayList<Encoders> getEncoders(){
         return AVAILABLE_ENCODERS;
@@ -59,6 +60,10 @@ public class EncoderCheck {
         return sizes;
     }
 
+    public static Sizes getSize(){
+        return AVAILABLE_SIZES.get(1);
+    }
+
     public static String sizeFormatter(Sizes size){
         return switch (size) {
             case Source -> "";
@@ -78,6 +83,7 @@ public class EncoderCheck {
         AVAILABLE_SIZES.add(Sizes.Source);
         System.out.println("Detecting allowed sizes...");
         String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i " + file.getAbsolutePath());
+        HEIGHT = Integer.parseInt(hSize);
         if (hSize.equals("")) {
             System.out.println("Failed to detect allowed sizes.\n Reason: Failed to get video height.");
         } else {

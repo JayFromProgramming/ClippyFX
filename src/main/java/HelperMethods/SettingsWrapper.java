@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class SettingsWrapper {
     private static final String SETTINGS_FILE_NAME = "settings/settings.json";
-    private static final String TEMPLATE_FILE_PATH = "src/main/resources/settingsTemplates/settings.json";
+    private static final String TEMPLATE_FILE_PATH = "settingsTemplates/settings.json";
 
     private static JSONObject settingsJSON;
     private static JSONObject templateJSON;

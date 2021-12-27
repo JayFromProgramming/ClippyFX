@@ -1,13 +1,10 @@
 package EncodingMagic;
 
 import HelperMethods.EncoderCheck;
-import HelperMethods.StreamedCommand;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class FilePegGenerator implements PegGenerator {
 
@@ -16,7 +13,12 @@ public class FilePegGenerator implements PegGenerator {
     private int sourceTotalFrames;
     private double START_TIME;
     private double END_TIME;
-    PegType TYPE = PegType.File;
+
+
+    @Override
+    public PegType getType() {
+        return PegType.File;
+    }
 
     @Override
     public double getStartTime() {return START_TIME;}
@@ -55,14 +57,14 @@ public class FilePegGenerator implements PegGenerator {
     }
 
     @Override
-    public String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes size,
+    public String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes dimensions,
                            boolean allow100MB, double fps, String saveName){
         return switch (encoder) {
-            case libx264 -> buildCPUX264Peg(size, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
-            case h264_nvenc -> buildNVENCX264Peg(size, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
-            case h264_amf -> buildAMFX264Peg(size, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case libx264 -> buildCPUX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case h264_nvenc -> buildNVENCX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case h264_amf -> buildAMFX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
             case h264_qsv -> throw new NotImplementedException("QSV is not currently supported");
-            case libvpx_vp9 -> buildVP9Peg(size, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case libvpx_vp9 -> buildVP9Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
         };
     }
 

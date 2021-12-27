@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");
         stage.setScene(scene);
-        stage.getIcons().add(new Image("file:src/main/resources/videoResources/Icon.png"));
+//        stage.getIcons().add(new Image("file:src/main/resources/videoResources/Icon.png"));
         stage.show();
         MainController controller = fxmlLoader.getController();
         controller.Pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);
@@ -39,7 +39,7 @@ public class HelloApplication extends Application {
         /* Check if a settings file exists */
         File settingsFile = new File("settings/settings.json");
         if (!settingsFile.exists()) {
-            File settingsFileTemplate = new File("src/main/resources/settingsTemplates/settings.json");
+            File settingsFileTemplate = new File("settingsTemplates/settings.json");
             // Copy the settings file to the settings directory
             Files.copy(Path.of(settingsFileTemplate.getAbsolutePath()), Path.of(settingsFile.getAbsolutePath()));
         }

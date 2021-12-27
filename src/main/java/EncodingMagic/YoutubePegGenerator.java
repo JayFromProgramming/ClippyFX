@@ -2,13 +2,18 @@ package EncodingMagic;
 
 import HelperMethods.EncoderCheck;
 import Interfaces.PegGenerator;
+import javafx.scene.media.MediaPlayer;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 public class YoutubePegGenerator implements PegGenerator {
 
-    PegType TYPE = PegType.Youtube;
+
+    @Override
+    public PegType getType() {
+        return PegType.Youtube;
+    }
 
     @Override
     public double getStartTime() {

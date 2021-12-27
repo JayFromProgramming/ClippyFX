@@ -1,7 +1,7 @@
 package Interfaces;
 
-import EncodingMagic.EncoderPreset;
 import HelperMethods.EncoderCheck;
+import javafx.scene.media.MediaPlayer;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public interface PegGenerator {
         UnDeclared
     }
 
-    PegType TYPE = PegType.UnDeclared;
+    PegType getType();
 
     double getStartTime();
     double getEndTime();

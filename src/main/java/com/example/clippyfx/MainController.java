@@ -107,7 +107,7 @@ public class MainController {
             }
         };
         timer.start();
-        if (pegGenerator.TYPE == PegGenerator.PegType.Youtube) {
+        if (pegGenerator.getType() == PegGenerator.PegType.Youtube) {
             fps = 30;
         } else {
             String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + VideoURI.getText().substring(6) + "\"";
@@ -282,6 +282,7 @@ public class MainController {
         alert.showAndWait();
     }
 
+    @FXML
     public void openSettings(MouseEvent mouseEvent) throws IOException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
