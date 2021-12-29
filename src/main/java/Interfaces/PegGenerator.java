@@ -26,13 +26,13 @@ public interface PegGenerator {
      * Used if the type of video is a local file
      * @param uri The uri of the file
      */
-    void setVideo(String uri);
+    void setVideoFile(String uri);
 
     /**
      * Used if the type of video is a youtube video
      * @param youtubeData The data of the youtube video
      */
-    void setVideo(JSONObject youtubeData);
+    void setVideoYT(JSONObject youtubeData);
 
     void passMetaData(double source_fps, double source_duration);
 

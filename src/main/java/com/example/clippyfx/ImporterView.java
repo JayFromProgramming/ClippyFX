@@ -78,7 +78,7 @@ public class ImporterView implements PopOut {
 
     private PegGenerator getPegGenerator() {
         PegGenerator pegGenerator = new FilePegGenerator();
-        pegGenerator.setVideo(VideoURI.getText());
+        pegGenerator.setVideoFile(VideoURI.getText());
         return pegGenerator;
     }
 

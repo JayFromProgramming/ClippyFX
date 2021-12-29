@@ -30,12 +30,12 @@ public class FilePegGenerator implements PegGenerator {
     public double getFPS() {return sourceFps;}
 
     @Override
-    public void setVideo(String uri) {
+    public void setVideoFile(String uri) {
         filePath = uri.substring(6); // remove "file://"
     }
 
     @Override
-    public void setVideo(JSONObject youtubeData) {
+    public void setVideoYT(JSONObject youtubeData) {
         throw new UnsupportedOperationException("This method is not supported by the FilePegGenerator");
     }
 

@@ -45,7 +45,7 @@ public class YoutubeView implements PopOut {
 
     private PegGenerator getPegGenerator(){
       PegGenerator pegGenerator = new YoutubePegGenerator();
-      pegGenerator.setVideo(this.json);
+      pegGenerator.setVideoYT(this.json);
       return pegGenerator;
     }
 

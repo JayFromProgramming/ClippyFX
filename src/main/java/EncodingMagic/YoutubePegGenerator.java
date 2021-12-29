@@ -31,12 +31,12 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public void setVideo(String uri) {
+    public void setVideoFile(String uri) {
         throw new UnsupportedOperationException("This method is not supported by the YoutubePegGenerator");
     }
 
     @Override
-    public void setVideo(JSONObject youtubeData) {
+    public void setVideoYT(JSONObject youtubeData) {
 
     }
 
