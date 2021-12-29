@@ -23,6 +23,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
@@ -53,6 +54,7 @@ public class MainController {
     public Button clipItButton;
     public Button vp9LoadButton;
     public Button ejectButton;
+    public Button settingsButton;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
@@ -217,7 +219,20 @@ public class MainController {
         clippingProgressWindow.passObjects(mediaPlayer, this.pegGenerator);
     }
 
-    public void loadFile(MouseEvent mouseEvent) throws IOException, TimeoutException, InterruptedException {
+    public void loadFromCommandLine(String[] args) throws IOException, InterruptedException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Advanced video loader");
+        stage.setScene(scene);
+        stage.show();
+        ImporterView compat = fxmlLoader.getController();
+        popOuts.add(compat);
+        File file = new File(args[0]);
+        compat.bypassFileChooser(file, new go());
+    }
+
+    public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
             if (popOut.getType() == PopOut.popOutType.ConverterView) {

@@ -206,6 +206,17 @@ public class ImporterView implements PopOut {
         }
     }
 
+    public void bypassFileChooser(File file, Method execute) throws IOException, InterruptedException {
+        this.finishMethod = execute;
+        this.closeHook(this.pain);
+        pathBox.setDisable(true);
+        nameBox.setDisable(true);
+        typeBox.setDisable(true);
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+        checkHWACCEL();
+        preformImport(file);
+    }
+
     @SuppressWarnings("unchecked")
     public void passObjects(TextField VideoURI, Method execute) throws IOException, InterruptedException {
 
@@ -229,6 +240,11 @@ public class ImporterView implements PopOut {
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
         java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
         fileChooser = null;
+        preformImport(file);
+    }
+
+
+    private void preformImport(File file) throws IOException, InterruptedException {
         if (file != null) {
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
             ffmpegOutput.appendText("Determining encoding type\n");
