@@ -106,21 +106,21 @@ public class EncoderCheck {
         System.out.println("Detecting encoders...");
         try {
             System.out.println("Checking for h264_nvenc...");
-            Process hwaccel = StreamedCommand.runCommand("ffmpeg -i src/main/resources/videoResources/got_this.webm -c:v h264_nvenc -frames 1 -f null NUL");
+            Process hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_nvenc -frames 1 -f null NUL");
             int resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_nvenc);
                 System.out.println("Found h264_nvenc");
             }
             System.out.println("Checking for h264_amf...");
-            hwaccel = StreamedCommand.runCommand("ffmpeg -i src/main/resources/videoResources/got_this.webm -c:v h264_amf -frames 1 -f null NUL");
+            hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_amf -frames 1 -f null NUL");
             resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_amf);
                 System.out.println("Found h264_amf");
             }
             System.out.println("Checking for h264_qsv...");
-            hwaccel = StreamedCommand.runCommand("ffmpeg -i src/main/resources/videoResources/got_this.webm -c:v h264_qsv -frames 1 -f null NUL");
+            hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_qsv -frames 1 -f null NUL");
             resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_qsv);

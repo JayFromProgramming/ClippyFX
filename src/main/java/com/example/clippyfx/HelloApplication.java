@@ -34,16 +34,19 @@ public class HelloApplication extends Application {
         /* Check if a settings directory exists */
         File settingsDir = new File("settings");
         if (!settingsDir.exists()) {
+            System.out.println("Creating settings directory");
             settingsDir.mkdir();
         }
         /* Check if a settings file exists */
         File settingsFile = new File("settings/settings.json");
         if (!settingsFile.exists()) {
-            File settingsFileTemplate = new File("settingsTemplates/settings.json");
+            File settingsFileTemplate = new File("resources/settingsTemplates/settings.json");
             // Copy the settings file to the settings directory
             Files.copy(Path.of(settingsFileTemplate.getAbsolutePath()), Path.of(settingsFile.getAbsolutePath()));
         }
         SettingsWrapper.loadSettings();
+        File tempFile = new File("resources/videoResources/TempWorkingFile.mp4");
+        if (tempFile.exists()) tempFile.delete();
         launch();
     }
 }

@@ -201,7 +201,7 @@ public class ImporterView implements PopOut {
             ffmpegOutput.appendText("Conversion successful.");
             System.out.println("Conversion successful.");
             VideoURI.setText(temp.toURI().toString());
-            temp.deleteOnExit(); // Clean up after yourself
+            temp.deleteOnExit(); // Delete the temp file after normal termination of the JVM
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
             ((Stage) pain.getScene().getWindow()).close();
@@ -250,7 +250,7 @@ public class ImporterView implements PopOut {
             }else{
                 // If not, convert it to a supported encoding
                 pathBox.setText(file.getAbsolutePath());
-                nameBox.setText("src/main/resources/videoResources/TempWorkingFile.mp4");
+                nameBox.setText("resources/videoResources/TempWorkingFile.mp4");
                 convertIt();
             }
         } else {
