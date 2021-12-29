@@ -262,12 +262,18 @@ public class MainController {
     public void onUncaughtException(Thread thread, Throwable throwable) {
         System.out.println("Uncaught exception: " + throwable.getClass().getName());
         System.out.println("Thread: " + thread.getName());
-        System.out.println("Cause: " + throwable.getCause());
+        StringBuilder cause = new StringBuilder();
+        Throwable lastCause = throwable;
+        while (lastCause.getCause() != null) {
+            System.out.println("Caused by: " + throwable.getCause().getClass().getName());
+            cause.append("Which caused: ").append(throwable.getCause().getClass().getName()).append("\n");
+            lastCause = lastCause.getCause();
+        }
         System.out.println("Stack trace: ");
         throwable.printStackTrace();
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("\"" + thread.getName() + "\" has encountered an error");
-        alert.setHeaderText("Type: " + throwable.getClass().getName());
+        alert.setHeaderText("Type: " + lastCause.getClass().getName() + "\n" + cause);
         alert.setResizable(true);
         StringBuilder sb = new StringBuilder();
         int lines = 0;

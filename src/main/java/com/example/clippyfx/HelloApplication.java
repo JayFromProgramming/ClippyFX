@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");
         stage.setScene(scene);
-//        stage.getIcons().add(new Image("file:src/main/resources/videoResources/Icon.png"));
+        stage.getIcons().add(new Image("file:resources/videoResources/Icon.png"));
         stage.show();
         MainController controller = fxmlLoader.getController();
         controller.Pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);

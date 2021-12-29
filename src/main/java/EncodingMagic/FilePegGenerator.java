@@ -14,6 +14,13 @@ public class FilePegGenerator implements PegGenerator {
     private double START_TIME;
     private double END_TIME;
 
+    public FilePegGenerator(){}
+
+    public FilePegGenerator(String uri){
+        if (uri.startsWith("file://")) {
+            filePath = uri.substring(6);
+        }else filePath = uri;
+    }
 
     @Override
     public PegType getType() {
@@ -31,7 +38,9 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public void setVideoFile(String uri) {
-        filePath = uri.substring(6); // remove "file://"
+        if (uri.startsWith("file://")) {
+            filePath = uri.substring(6);
+        }else filePath = uri;
     }
 
     @Override

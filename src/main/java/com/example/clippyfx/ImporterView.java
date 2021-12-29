@@ -76,12 +76,6 @@ public class ImporterView implements PopOut {
 //        clipItButton.setDisable(true);
     }
 
-    private PegGenerator getPegGenerator() {
-        PegGenerator pegGenerator = new FilePegGenerator();
-        pegGenerator.setVideoFile(VideoURI.getText());
-        return pegGenerator;
-    }
-
     private class progressUpdater extends AnimationTimer{
 
         private final BufferedReader reader;
@@ -205,7 +199,7 @@ public class ImporterView implements PopOut {
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
             ((Stage) pain.getScene().getWindow()).close();
-            this.finishMethod.execute(this.getPegGenerator());
+            this.finishMethod.execute(new FilePegGenerator(VideoURI.getText()));
         } else {
             ffmpegOutput.appendText("Conversion failed unable to find output file.");
             System.out.println("Conversion failed unable to find output file.");
@@ -242,11 +236,14 @@ public class ImporterView implements PopOut {
             // Check if the file is a supported encoding
             String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
             ffmpegOutput.appendText("Encoding type: " + encoding + "\n");
-            if (encoding.equals("h264")) {
+            System.out.println("Encoding type: " + encoding);
+            if (encoding.equals("h264") && file.getName().endsWith(".mp4")) {
                 // If it is, bypass the file conversion and just set the video URI
+                System.out.println("Encoding type is h264, bypassing conversion.");
                 VideoURI.setText(file.toURI().toString());
+                isAlive = false;
                 ((Stage) pain.getScene().getWindow()).close();
-                this.finishMethod.execute(this.getPegGenerator());
+                this.finishMethod.execute(new FilePegGenerator(VideoURI.getText()));
             }else{
                 // If not, convert it to a supported encoding
                 pathBox.setText(file.getAbsolutePath());
