@@ -1,7 +1,6 @@
 package Interfaces;
 
-import HelperMethods.EncoderCheck;
-import javafx.scene.media.MediaPlayer;
+import HelperMethods.VideoChecks;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -21,6 +20,10 @@ public interface PegGenerator {
     double getStartTime();
     double getEndTime();
     double getFPS();
+
+    ArrayList<String> getEncoders();
+
+    ArrayList<String> getSizes();
 
     /**
      * Used if the type of video is a local file
@@ -49,7 +52,7 @@ public interface PegGenerator {
      * @return A FFMPEG command to encode the video
      * @throws IOException Thrown if the FFMPEG command cannot be generated
      */
-    String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes dimensions,
+    String buildPeg(VideoChecks.Encoders encoder, VideoChecks.Sizes dimensions,
                     boolean allow100MB, double fps, String saveName) throws IOException;
 
 }

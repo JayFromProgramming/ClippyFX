@@ -1,6 +1,6 @@
 package com.example.clippyfx;
 
-import HelperMethods.EncoderCheck;
+import HelperMethods.VideoChecks;
 import HelperMethods.SettingsWrapper;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -19,7 +19,7 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        new Thread(EncoderCheck::checkEncoders).start();
+        new Thread(VideoChecks::checkEncoders).start();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");

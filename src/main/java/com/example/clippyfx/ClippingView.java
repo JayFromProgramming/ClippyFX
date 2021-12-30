@@ -1,6 +1,6 @@
 package com.example.clippyfx;
 
-import HelperMethods.EncoderCheck;
+import HelperMethods.VideoChecks;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import Interfaces.PopOut;
@@ -128,15 +128,15 @@ public class ClippingView implements PopOut {
         }
     }
 
-    private EncoderCheck.Encoders getEncoder() {
-        return EncoderCheck.Encoders.valueOf(presetBox.getValue().toString());
+    private VideoChecks.Encoders getEncoder() {
+        return VideoChecks.Encoders.valueOf(presetBox.getValue().toString());
     }
 
-    private EncoderCheck.Sizes getSize() {
+    private VideoChecks.Sizes getSize() {
         if (videoSizeSelect.getValue().toString().equals("Source")) {
-            return EncoderCheck.Sizes.Source;
+            return VideoChecks.Sizes.Source;
         }else{
-            return EncoderCheck.Sizes.valueOf("x" + videoSizeSelect.getValue().toString());
+            return VideoChecks.Sizes.valueOf("x" + videoSizeSelect.getValue().toString());
         }
     }
 
@@ -179,8 +179,8 @@ public class ClippingView implements PopOut {
         this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
-        presetBox.setItems(FXCollections.observableArrayList(EncoderCheck.getEncodersString()));
-        videoSizeSelect.setItems(FXCollections.observableArrayList(EncoderCheck.getAllowedSizesString()));
+        presetBox.setItems(FXCollections.observableArrayList(pegGenerator.getEncoders()));
+        videoSizeSelect.setItems(FXCollections.observableArrayList(pegGenerator.getSizes()));
         presetBox.setValue(SettingsWrapper.getSetting("preferredOutputEncoder").value);
         videoSizeSelect.setValue(SettingsWrapper.getSetting("preferredVideoSize").value);
         fpsSelect.setText(String.valueOf(fps));

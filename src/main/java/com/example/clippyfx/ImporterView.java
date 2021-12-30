@@ -1,12 +1,11 @@
 package com.example.clippyfx;
 
 import EncodingMagic.FilePegGenerator;
-import HelperMethods.EncoderCheck;
+import HelperMethods.VideoChecks;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
 import Interfaces.Method;
-import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
@@ -18,7 +17,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -130,12 +128,12 @@ public class ImporterView implements PopOut {
 
     @SuppressWarnings("unchecked")
     private void checkHWACCEL() {
-        ArrayList<EncoderCheck.Encoders> encoders = EncoderCheck.getEncoders();
-        if (encoders.contains(EncoderCheck.Encoders.h264_nvenc)) {
+        ArrayList<VideoChecks.Encoders> encoders = VideoChecks.getEncoders();
+        if (encoders.contains(VideoChecks.Encoders.h264_nvenc)) {
             typeBox.getSelectionModel().select("h264_nvenc");
-        } else if (encoders.contains(EncoderCheck.Encoders.h264_amf)) {
+        } else if (encoders.contains(VideoChecks.Encoders.h264_amf)) {
             typeBox.getSelectionModel().select("h264_amf");
-        }else if (encoders.contains(EncoderCheck.Encoders.libx264)) {
+        }else if (encoders.contains(VideoChecks.Encoders.libx264)) {
             typeBox.getSelectionModel().select("libx264");
         } else {
             throw new IllegalStateException("No encoder found.");
@@ -249,7 +247,7 @@ public class ImporterView implements PopOut {
         if (file != null) {
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
             ffmpegOutput.appendText("Determining encoding type\n");
-            EncoderCheck.checkAllowedSizes(file);
+            VideoChecks.checkAllowedSizes(file);
             // Check if the file is a supported encoding
             String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
             ffmpegOutput.appendText("Encoding type: " + encoding + "\n");

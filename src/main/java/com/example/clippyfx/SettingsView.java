@@ -1,6 +1,6 @@
 package com.example.clippyfx;
 
-import HelperMethods.EncoderCheck;
+import HelperMethods.VideoChecks;
 import HelperMethods.SettingsWrapper;
 import Interfaces.PopOut;
 import javafx.scene.control.*;
@@ -12,10 +12,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SettingsView implements PopOut {
 
@@ -62,14 +60,14 @@ public class SettingsView implements PopOut {
             }
             case "sizeEnum" -> {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
-                choiceBox.getItems().addAll(EncoderCheck.getSizesString());
+                choiceBox.getItems().addAll(VideoChecks.getSizesString());
                 choiceBox.setValue(setting.value);
                 choiceBox.setLayoutY(yOffset + 5);
                 pane.getChildren().addAll(fieldName, choiceBox);
             }
             case "encoderEnum" -> {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
-                choiceBox.getItems().addAll(EncoderCheck.getEncodersString());
+                choiceBox.getItems().addAll(VideoChecks.getEncodersString());
                 choiceBox.setValue(setting.value);
                 choiceBox.setLayoutY(yOffset + 5);
                 pane.getChildren().addAll(fieldName, choiceBox);

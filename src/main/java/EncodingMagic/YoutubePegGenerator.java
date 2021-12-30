@@ -1,8 +1,7 @@
 package EncodingMagic;
 
-import HelperMethods.EncoderCheck;
+import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
-import javafx.scene.media.MediaPlayer;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -56,7 +55,7 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes dimensions,
+    public String buildPeg(VideoChecks.Encoders encoder, VideoChecks.Sizes dimensions,
                            boolean allow100MB, double fps, String saveName) throws IOException {
         return null;
     }

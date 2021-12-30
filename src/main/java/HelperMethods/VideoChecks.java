@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class EncoderCheck {
+public class VideoChecks {
 
     public enum Encoders {
         libx264,
@@ -59,6 +59,10 @@ public class EncoderCheck {
         }
         return sizes;
     }
+
+    public static ArrayList<Sizes> getAllowedSizes(){
+        return AVAILABLE_SIZES;
+    };
 
     public static Sizes getSize(){
         return AVAILABLE_SIZES.get(1);
