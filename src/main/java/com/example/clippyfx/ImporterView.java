@@ -197,6 +197,7 @@ public class ImporterView implements PopOut {
             temp.deleteOnExit(); // Delete the temp file after normal termination of the JVM
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
+            this.pegGenerator.setTempFile(temp.getAbsolutePath());
             ((Stage) pain.getScene().getWindow()).close();
             this.finishMethod.execute(this.pegGenerator);
         } else {
