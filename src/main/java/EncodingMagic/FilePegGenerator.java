@@ -5,6 +5,7 @@ import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.Objects;
 
 
@@ -20,9 +21,9 @@ public class FilePegGenerator implements PegGenerator {
     public FilePegGenerator(){}
 
     public FilePegGenerator(String uri){
-        if (uri.startsWith("file:/")) {
-            filePath = uri.substring(6);
-        }else filePath = uri;
+        if (uri.contains("file://")) {
+            this.filePath = uri.replace("file://", "");
+        }else this.filePath = uri;
     }
 
     @Override
@@ -41,13 +42,13 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public void setVideoFile(String uri) {
-        if (uri.startsWith("file:/")) {
-            filePath = uri.substring(6);
-        }else filePath = uri;
+        if (uri.contains("file://")) {
+            this.filePath = uri.replace("file://", "");
+        }else this.filePath = uri;
     }
 
-    public void setTempFile(String filePath) {
-        this.tempPath = filePath;
+    public void setTempFile(String path) {
+        tempPath = path;
     }
 
     @Override
@@ -75,6 +76,10 @@ public class FilePegGenerator implements PegGenerator {
     @Override
     public String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes dimensions,
                            boolean allow100MB, double fps, String savePath){
+        System.out.println("Building Peg");
+        System.out.println("File Path: " + filePath + "\nTemp Path: " + tempPath
+                + "\nSave Path: " + savePath + "\nEncoder: " + encoder.toString() +
+                "\nDimensions: " + dimensions.toString() + "\nAllow 100MB: " + allow100MB + "\nFPS: " + fps);
         if (Objects.equals(filePath, savePath)){
             if (tempPath == null) throw new IllegalStateException("Both input path and output path are the same, " +
                     "no available temp file to fall back to");
