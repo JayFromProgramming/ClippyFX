@@ -5,10 +5,13 @@ import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 
 public class FilePegGenerator implements PegGenerator {
 
     private String filePath;
+    private String tempPath;
     private double sourceFps;
     private int sourceTotalFrames;
     private double START_TIME;
@@ -17,7 +20,7 @@ public class FilePegGenerator implements PegGenerator {
     public FilePegGenerator(){}
 
     public FilePegGenerator(String uri){
-        if (uri.startsWith("file://")) {
+        if (uri.startsWith("file:/")) {
             filePath = uri.substring(6);
         }else filePath = uri;
     }
@@ -38,9 +41,13 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public void setVideoFile(String uri) {
-        if (uri.startsWith("file://")) {
+        if (uri.startsWith("file:/")) {
             filePath = uri.substring(6);
         }else filePath = uri;
+    }
+
+    public void setTempFile(String filePath) {
+        this.tempPath = filePath;
     }
 
     @Override
@@ -67,13 +74,19 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public String buildPeg(EncoderCheck.Encoders encoder, EncoderCheck.Sizes dimensions,
-                           boolean allow100MB, double fps, String saveName){
+                           boolean allow100MB, double fps, String savePath){
+        if (Objects.equals(filePath, savePath)){
+            if (tempPath == null) throw new IllegalStateException("Both input path and output path are the same, " +
+                    "no available temp file to fall back to");
+            filePath = tempPath;
+        }
+
         return switch (encoder) {
-            case libx264 -> buildCPUX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
-            case h264_nvenc -> buildNVENCX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
-            case h264_amf -> buildAMFX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case libx264 -> buildCPUX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, savePath);
+            case h264_nvenc -> buildNVENCX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, savePath);
+            case h264_amf -> buildAMFX264Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, savePath);
             case h264_qsv -> throw new NotImplementedException("QSV is not currently supported");
-            case libvpx_vp9 -> buildVP9Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, saveName);
+            case libvpx_vp9 -> buildVP9Peg(dimensions, allow100MB, fps, START_TIME, END_TIME, filePath, savePath);
         };
     }
 

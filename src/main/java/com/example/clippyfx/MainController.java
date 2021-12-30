@@ -78,6 +78,7 @@ public class MainController {
 
     protected void loadMedia(PegGenerator pegGenerator) throws IOException {
         System.out.println("Media loading...");
+        setEnabledUI(true);
         this.pegGenerator = pegGenerator;
         Media media = new Media(VideoURI.getText());
         mediaPlayer = new MediaPlayer(media);
@@ -116,7 +117,6 @@ public class MainController {
             fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         }
         System.out.println("FPS: " + fps);
-        setEnabledUI(true);
         System.out.println("Media loaded.");
     }
 

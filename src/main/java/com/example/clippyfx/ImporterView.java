@@ -52,10 +52,9 @@ public class ImporterView implements PopOut {
     private ArrayList<String> splitList;
     private boolean clipping = false;
     private Process clipper;
-    private TextArea youtubeData;
-    private JSONArray videoURIs;
     private FileChooser fileChooser;
     private Method finishMethod;
+    private FilePegGenerator pegGenerator;
 
     public ImporterView() {
 
@@ -199,7 +198,7 @@ public class ImporterView implements PopOut {
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
             ((Stage) pain.getScene().getWindow()).close();
-            this.finishMethod.execute(new FilePegGenerator(VideoURI.getText()));
+            this.finishMethod.execute(this.pegGenerator);
         } else {
             ffmpegOutput.appendText("Conversion failed unable to find output file.");
             System.out.println("Conversion failed unable to find output file.");
@@ -239,6 +238,7 @@ public class ImporterView implements PopOut {
                 "*.mp4", "*.avi", "*.mov"));
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
         java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
+        this.pegGenerator = new FilePegGenerator(file.toURI().toString());
         fileChooser = null;
         preformImport(file);
     }
@@ -259,7 +259,7 @@ public class ImporterView implements PopOut {
                 VideoURI.setText(file.toURI().toString());
                 isAlive = false;
                 ((Stage) pain.getScene().getWindow()).close();
-                this.finishMethod.execute(new FilePegGenerator(VideoURI.getText()));
+                this.finishMethod.execute(this.pegGenerator);
             }else{
                 // If not, convert it to a supported encoding
                 pathBox.setText(file.getAbsolutePath());
