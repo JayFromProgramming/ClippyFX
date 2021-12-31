@@ -112,26 +112,29 @@ public class VideoChecks {
         AVAILABLE_ENCODERS.add(Encoders.libx264);
         AVAILABLE_ENCODERS.add(Encoders.libvpx_vp9);
         System.out.println("Detecting encoders...");
+        System.out.println("Found libx264");
+        System.out.println("Found libvpx_vp9");
         try {
-            System.out.println("Checking for h264_nvenc...");
+//            System.out.println("Checking for h264_nvenc...");
             Process hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_nvenc -frames 1 -f null NUL");
             int resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_nvenc);
                 System.out.println("Found h264_nvenc");
             }
-            System.out.println("Checking for h264_amf...");
+//            System.out.println("Checking for h264_amf...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_amf -frames 1 -f null NUL");
             resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_amf);
                 System.out.println("Found h264_amf");
             }
-            System.out.println("Checking for h264_qsv...");
+//            System.out.println("Checking for h264_qsv...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/got_this.webm -c:v h264_qsv -frames 1 -f null NUL");
             resultCode = StreamedCommand.waitForExit(hwaccel, 1);
             if (resultCode == 0) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_qsv);
+                System.out.println("Found h264_qsv");
             }
         }catch (IOException e){
             System.out.println("Failed to all encoders.\n Reason: " + e.getMessage());

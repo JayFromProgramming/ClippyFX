@@ -199,8 +199,8 @@ public class ImporterView implements PopOut {
             ((Stage) pain.getScene().getWindow()).close();
             this.finishMethod.execute(this.pegGenerator);
         } else {
-            ffmpegOutput.appendText("Conversion failed unable to find output file.");
-            System.out.println("Conversion failed unable to find output file.");
+            ffmpegOutput.appendText("Conversion failed unable to find temp file.");
+            System.out.println("Conversion failed unable to find temp file.");
         }
     }
 
@@ -278,7 +278,9 @@ public class ImporterView implements PopOut {
             } else if (encoding.equals("h264")){
                 System.out.println("Converting container to mp4");
                 String command = "ffmpeg -i \"%s\" -c copy \"%s\"";
-                StreamedCommand.runCommand(String.format(command, file.getAbsolutePath(), nameBox.getText()));
+                Process process = StreamedCommand.runCommand(String.format(command, file.getAbsolutePath(),
+                        nameBox.getText()));
+                process.waitFor();
                 this.finish();
             } else {
                 // If not, convert it to a supported encoding
