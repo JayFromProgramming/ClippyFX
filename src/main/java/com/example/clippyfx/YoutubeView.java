@@ -162,6 +162,7 @@ public class YoutubeView implements PopOut {
 
     public void submitURI(MouseEvent mouseEvent) throws IOException {
         videoURI.setText(mainURI);
+        this.isAlive = false;
         finishMethod.execute(this.getPegGenerator());
         ((Stage) pane.getScene().getWindow()).close();
     }
@@ -180,7 +181,7 @@ public class YoutubeView implements PopOut {
     public boolean close() {
         isAlive = false;
         ((Stage) pane.getScene().getWindow()).close();
-        return false;
+        return true;
     }
 
     @Override
