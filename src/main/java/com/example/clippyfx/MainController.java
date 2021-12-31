@@ -74,12 +74,13 @@ public class MainController {
             File file = event.getDragboard().getFiles().get(0);
             if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")
                     || file.getName().endsWith(".webm") || file.getName().endsWith(".mov")) {
-                event.acceptTransferModes(TransferMode.COPY);
+                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }else {
                 event.acceptTransferModes(TransferMode.NONE);
             }
         } else if (event.getDragboard().hasString()) {
-            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")) {
+            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")
+                    || event.getDragboard().getString().startsWith("https://youtu.be/")) {
                 event.acceptTransferModes(TransferMode.LINK);
             }
         }

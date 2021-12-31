@@ -262,6 +262,8 @@ public class ImporterView implements PopOut {
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
             ffmpegOutput.appendText("Determining encoding type\n");
             VideoChecks.checkAllowedSizes(file);
+            pathBox.setText(file.getAbsolutePath());
+            nameBox.setText("resources/videoResources/TempWorkingFile.mp4");
             // Check if the file is a supported encoding
             String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
             ffmpegOutput.appendText("Encoding type: " + encoding + "\n");
@@ -275,8 +277,6 @@ public class ImporterView implements PopOut {
                 this.finishMethod.execute(this.pegGenerator);
             }else{
                 // If not, convert it to a supported encoding
-                pathBox.setText(file.getAbsolutePath());
-                nameBox.setText("resources/videoResources/TempWorkingFile.mp4");
                 convertIt();
             }
         } else {

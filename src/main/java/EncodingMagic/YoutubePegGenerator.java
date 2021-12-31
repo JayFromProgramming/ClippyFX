@@ -10,6 +10,19 @@ import java.util.ArrayList;
 public class YoutubePegGenerator implements PegGenerator {
 
 
+    private final JSONObject youtubeData;
+    private double START_TIME;
+    private double END_TIME;
+    private double sourceFrameRate;
+    private int sourceHeight;
+    private int sourceDuration;
+
+
+    public YoutubePegGenerator(JSONObject youtubeData) {
+        this.youtubeData = youtubeData;
+    }
+
+
     @Override
     public PegType getType() {
         return PegType.Youtube;
@@ -17,25 +30,21 @@ public class YoutubePegGenerator implements PegGenerator {
 
     @Override
     public double getStartTime() {
-        return 0;
+        return START_TIME;
     }
 
     @Override
     public double getEndTime() {
-        return 0;
+        return END_TIME;
     }
 
     @Override
     public double getFPS() {
-        return 0;
+        return sourceFrameRate;
     }
 
     @Override
-    public ArrayList<String> getEncoders() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("Not implemented");
-        return list;
-    }
+    public ArrayList<String> getEncoders() {return VideoChecks.getEncodersString();}
 
     @Override
     public ArrayList<String> getSizes() {
@@ -50,18 +59,21 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
+    @Deprecated
     public void setVideoYT(JSONObject youtubeData) {
-
+        // lmao I'm lazy as fuck
     }
 
     @Override
     public void passMetaData(double source_fps, double source_duration) {
-
+       this.sourceDuration = this.youtubeData.getInt("duration");
+       this.sourceFrameRate = this.youtubeData.getInt("fps");
     }
 
     @Override
     public void loadClipBounds(double start, double end) {
-
+        this.START_TIME = start;
+        this.END_TIME = end;
     }
 
     @Override

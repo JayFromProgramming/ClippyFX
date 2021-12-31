@@ -14,7 +14,7 @@
    <children>
       <ImageView fx:id="thumbnailViewer" fitHeight="140.0" fitWidth="206.0" layoutX="14.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@no_thumbnail.png" />
+            <Image url="@../../../../resources/videoResources/YouTube.png" />
          </image>
       </ImageView>
       <TextField fx:id="youtubeLinkBox" layoutX="237.0" layoutY="175.0" prefHeight="26.0" prefWidth="254.0" promptText="Enter youtube link" />

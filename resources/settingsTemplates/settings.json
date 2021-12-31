@@ -1,0 +1,44 @@
+{
+  "defaultAdvancedLoadPath": {
+    "name": "defaultAdvancedLoadPath",
+    "type": "filePath",
+    "value": "C:\\Users\\Public\\Videos",
+    "description": "The path to save the video to."
+  },
+  "defaultAdvancedSavePath": {
+    "name": "defaultAdvancedSavePath",
+    "type": "filePath",
+    "value": "C:\\Users\\Public\\Videos",
+    "description": "The path to save the video to."
+  },
+  "defaultYoutubeSavePath": {
+    "name": "defaultYoutubeSavePath",
+    "type": "filePath",
+    "value": "C:\\Users\\Public\\Videos",
+    "description": "The path to save the video to."
+  },
+  "defaultAllow100MB": {
+    "name": "defaultAllow100MB",
+    "type": "toggle",
+    "value": "true",
+    "description": "Whether or not to allow 100MB files."
+  },
+  "preferredVideoSize": {
+    "name": "preferredVideoSize",
+    "type": "sizeEnum",
+    "value": "Source",
+    "description": "The preferred video size to select."
+  },
+  "preferredOutputEncoder": {
+    "name": "preferredOutputEncoder",
+    "type": "encoderEnum",
+    "value": "libvpx_vp9",
+    "description": "The preferred encoder to select for output."
+  },
+  "preferredCompatibilityEncoder":  {
+    "name": "preferredCompatibilityEncoder",
+    "type": "encoderEnum",
+    "value": "libx264",
+    "description": "The preferred encoder to select for when converting to a compatible format."
+  }
+}

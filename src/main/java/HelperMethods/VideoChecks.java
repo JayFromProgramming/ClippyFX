@@ -27,7 +27,7 @@ public class VideoChecks {
     }
 
     private static final ArrayList<Encoders> AVAILABLE_ENCODERS = new ArrayList<>(Encoders.values().length);
-    private static final ArrayList<Sizes> AVAILABLE_SIZES = new ArrayList<>(Sizes.values().length);
+    public static final ArrayList<Sizes> AVAILABLE_SIZES = new ArrayList<>(Sizes.values().length);
     private static int HEIGHT = 0;
 
     public static ArrayList<Encoders> getEncoders(){
@@ -83,23 +83,27 @@ public class VideoChecks {
     }
 
     public static void checkAllowedSizes(File file) throws IOException {
+        System.out.println("Detecting allowed sizes...");
+        String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i \"" + file.getAbsolutePath() + "\"");
+        checkAllowedSizes(hSize);
+    }
+
+    public static void checkAllowedSizes(String hSize) {
+        HEIGHT = Integer.parseInt(hSize);
         AVAILABLE_SIZES.clear();
         AVAILABLE_SIZES.add(Sizes.Source);
-        System.out.println("Detecting allowed sizes...");
-        String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i " + file.getAbsolutePath());
-        HEIGHT = Integer.parseInt(hSize);
         if (hSize.equals("")) {
             System.out.println("Failed to detect allowed sizes.\n Reason: Failed to get video height.");
         } else {
             int height = Integer.parseInt(hSize);
-            if (height >= 2160) {AVAILABLE_SIZES.add(Sizes.x2160p); System.out.println("x2160p available");}
-            if (height >= 1440) {AVAILABLE_SIZES.add(Sizes.x1440p); System.out.println("x1440p available");}
-            if (height >= 1080) {AVAILABLE_SIZES.add(Sizes.x1080p); System.out.println("x1080p available");}
-            if (height >= 720) {AVAILABLE_SIZES.add(Sizes.x720p); System.out.println("x720p available");}
-            if (height >= 480) {AVAILABLE_SIZES.add(Sizes.x480p); System.out.println("x480p available");}
-            if (height >= 360) {AVAILABLE_SIZES.add(Sizes.x360p); System.out.println("x360p available");}
-            if (height >= 240) {AVAILABLE_SIZES.add(Sizes.x240p); System.out.println("x240p available");}
-            if (height >= 144) {AVAILABLE_SIZES.add(Sizes.x144p); System.out.println("x144p available");}
+            if (height >= 2160) AVAILABLE_SIZES.add(Sizes.x2160p);
+            if (height >= 1440) AVAILABLE_SIZES.add(Sizes.x1440p);
+            if (height >= 1080) AVAILABLE_SIZES.add(Sizes.x1080p);
+            if (height >= 720)  AVAILABLE_SIZES.add(Sizes.x720p);
+            if (height >= 480)  AVAILABLE_SIZES.add(Sizes.x480p);
+            if (height >= 360)  AVAILABLE_SIZES.add(Sizes.x360p);
+            if (height >= 240)  AVAILABLE_SIZES.add(Sizes.x240p);
+            if (height >= 144)  AVAILABLE_SIZES.add(Sizes.x144p);
         }
     }
 
