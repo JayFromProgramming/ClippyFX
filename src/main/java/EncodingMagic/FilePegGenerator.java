@@ -109,16 +109,29 @@ public class FilePegGenerator implements PegGenerator {
         };
     }
 
-    private String buildAMFX264Peg(EncoderCheck.Sizes size, boolean allow100MB, double fps, double startTime, double endTime,
-                                   String fileName, String saveName) {
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v h264_amf -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, fileName, endTime, saveName);
+    private String buildAMFX264Peg(VideoChecks.Sizes size, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
+        if (checkDuplicates(saveName + ".mp4")) filePath = tempPath;
+        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
+        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v h264_amf -c:a aac -quality:v 0 -rc:v vbr_peak -b:v %.3f -maxrate:v %.3f -b:a 128k -y \"%s.mp4\"";
+        return String.format(baseCommand, startTime, filePath, endTime - startTime, bitrate / 1.4, bitrate, saveName);
     }
 
-    private String buildNVENCX264Peg(EncoderCheck.Sizes size, boolean allow100MB, double fps, double startTime, double endTime,
-                                     String fileName, String saveName) {
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v h264_nvenc -c:a libopus -b:v 1500k -b:a 128k -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, fileName, endTime, saveName);
+    private String buildNVENCX264Peg(VideoChecks.Sizes size, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
+        if (checkDuplicates(saveName + ".mp4")) filePath = tempPath;
+        int crf = switch (size != VideoChecks.Sizes.Source ? size : VideoChecks.getSize()) {
+            case x2160p -> 12;
+            case x1440p -> 21;
+            case x1080p -> 27;
+            case x720p  -> 29;
+            case x480p  -> 31;
+            case x360p  -> 33;
+            case x240p  -> 34;
+            case x144p  -> 35;
+            default -> throw new IllegalStateException("Unexpected value: " + (size == VideoChecks.Sizes.Source ? size : VideoChecks.getSize()));
+        };
+        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
+        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v h264_nvenc -c:a aac %s -preset:v p6 -rc-lookahead 4 -cq %s -b:v %.3f -maxrate:v %.3f -r %.3f -b:a 128k -y \"%s.mp4\"";
+        return String.format(baseCommand, startTime, filePath, endTime - startTime, VideoChecks.sizeFormatter(size), crf, bitrate / 1.4, bitrate, fps, saveName);
     }
 
     private String buildCPUX264Peg(VideoChecks.Sizes dimensions, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
@@ -140,10 +153,23 @@ public class FilePegGenerator implements PegGenerator {
                 VideoChecks.sizeFormatter(dimensions), saveName);
     }
 
-    private String buildVP9Peg(EncoderCheck.Sizes dimensions, boolean allow100MB, double fps, double startTime, double endTime,
-                               String fileName, String saveName) {
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libvpx-vp9 -c:a libopus -b:v 1500k -b:a 128k -r %.3f %s -y \"%s.webm\"";
-        return String.format(baseCommand, startTime, fileName, endTime, fps,
-                EncoderCheck.sizeFormatter(dimensions), saveName);
+    private String buildVP9Peg(VideoChecks.Sizes dimensions, boolean allow100MB, double fps, double startTime,
+                               double endTime, String saveName) {
+        if (checkDuplicates(saveName + ".webm")) filePath = tempPath;
+        int crf = switch (dimensions != VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()) {
+            case x2160p -> 15;
+            case x1440p -> 24;
+            case x1080p -> 31;
+            case x720p  -> 32;
+            case x480p  -> 34;
+            case x360p  -> 36;
+            case x240p  -> 37;
+            case x144p  -> 38;
+            default -> throw new IllegalStateException("Unexpected value: " + (dimensions == VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()));
+        };
+        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
+        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libvpx-vp9 -c:a libopus -crf:v %s -b:v %.3f -maxrate:v %.3f -b:a 96k -r %.3f %s -y \"%s.webm\"";
+        return String.format(baseCommand, startTime, filePath, endTime - startTime, crf, bitrate / 1.4, bitrate, fps,
+                VideoChecks.sizeFormatter(dimensions), saveName);
     }
 }
