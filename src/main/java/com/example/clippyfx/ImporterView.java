@@ -275,7 +275,12 @@ public class ImporterView implements PopOut {
                 isAlive = false;
                 ((Stage) pain.getScene().getWindow()).close();
                 this.finishMethod.execute(this.pegGenerator);
-            }else{
+            } else if (encoding.equals("h264")){
+                System.out.println("Converting container to mp4");
+                String command = "ffmpeg -i \"%s\" -c copy \"%s\"";
+                StreamedCommand.runCommand(String.format(command, file.getAbsolutePath(), nameBox.getText()));
+                this.finish();
+            } else {
                 // If not, convert it to a supported encoding
                 convertIt();
             }
