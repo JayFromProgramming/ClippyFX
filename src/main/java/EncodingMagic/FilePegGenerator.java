@@ -136,7 +136,7 @@ public class FilePegGenerator implements PegGenerator {
             default -> throw new IllegalStateException("Unexpected value: " + (dimensions == VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()));
         };
         String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -to %.2f -c:v libx264 -c:a libopus -crf:v %s -b:v %.3f -maxrate:v %.3f -b:a 96k -r %.3f %s -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, filePath, endTime, crf, bitrate / 1.4, bitrate, fps,
+        return String.format(baseCommand, startTime, filePath, endTime - startTime, crf, bitrate / 1.4, bitrate, fps,
                 VideoChecks.sizeFormatter(dimensions), saveName);
     }
 

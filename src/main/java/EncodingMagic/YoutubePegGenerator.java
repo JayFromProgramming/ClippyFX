@@ -5,6 +5,7 @@ import Interfaces.PegGenerator;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class YoutubePegGenerator implements PegGenerator {
 
@@ -27,6 +28,20 @@ public class YoutubePegGenerator implements PegGenerator {
     @Override
     public double getFPS() {
         return 0;
+    }
+
+    @Override
+    public ArrayList<String> getEncoders() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("Not implemented");
+        return list;
+    }
+
+    @Override
+    public ArrayList<String> getSizes() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("Not implemented");
+        return list;
     }
 
     @Override

@@ -213,6 +213,8 @@ public class MainController {
         stage.show();
         double start = (clipStart.getValue() / 100) * mediaPlayer.getTotalDuration().toSeconds();
         double end = (clipEnd.getValue() / 100) * mediaPlayer.getTotalDuration().toSeconds();
+        System.out.println("Start: " + start);
+        System.out.println("End: " + end);
         this.pegGenerator.loadClipBounds(start, end);
         ClippingView clippingProgressWindow = fxmlLoader.getController();
         this.pegGenerator.passMetaData(this.fps, this.mediaPlayer.getTotalDuration().toSeconds());
@@ -285,6 +287,7 @@ public class MainController {
             lastCause = lastCause.getCause();
         }
         System.out.println("Stack trace: ");
+        System.out.println("Message: " + lastCause.getMessage());
         throwable.printStackTrace();
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("\"" + thread.getName() + "\" has encountered an error");

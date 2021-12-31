@@ -179,10 +179,19 @@ public class ClippingView implements PopOut {
         this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
+
         presetBox.setItems(FXCollections.observableArrayList(pegGenerator.getEncoders()));
         videoSizeSelect.setItems(FXCollections.observableArrayList(pegGenerator.getSizes()));
-        presetBox.setValue(SettingsWrapper.getSetting("preferredOutputEncoder").value);
-        videoSizeSelect.setValue(SettingsWrapper.getSetting("preferredVideoSize").value);
+        if (FXCollections.observableArrayList(pegGenerator.getEncoders()). // Make sure the preferred value is actually
+                contains(SettingsWrapper.getSetting("preferredOutputEncoder").value)){ // available.
+            this.presetBox.setValue(SettingsWrapper.getSetting("preferredOutputEncoder").value);
+        }else this.presetBox.setValue(pegGenerator.getEncoders().get(0));
+
+        if (FXCollections.observableArrayList(pegGenerator.getSizes()). // Make sure the preferred value is actually
+                contains(SettingsWrapper.getSetting("preferredVideoSize").value)){ // available.
+            this.videoSizeSelect.setValue(SettingsWrapper.getSetting("preferredVideoSize").value);
+        }else this.videoSizeSelect.setValue(pegGenerator.getSizes().get(0));
+
         fpsSelect.setText(String.valueOf(fps));
     }
 

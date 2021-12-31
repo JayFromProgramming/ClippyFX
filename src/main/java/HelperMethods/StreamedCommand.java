@@ -26,6 +26,7 @@ public class StreamedCommand {
         Process process = runCommand(command);
         int exitCode = waitForExit(process);
         if(exitCode != 0) {
+
             throw new IOException("Command " + command + " exited with code " + exitCode);
         }
         StringBuilder output = new StringBuilder();
