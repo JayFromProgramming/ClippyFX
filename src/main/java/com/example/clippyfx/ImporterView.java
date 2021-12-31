@@ -237,14 +237,28 @@ public class ImporterView implements PopOut {
                 "*.mp4", "*.avi", "*.mov"));
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
         java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
-        this.pegGenerator = new FilePegGenerator(file.toURI().toString());
         fileChooser = null;
         preformImport(file);
     }
 
+    @SuppressWarnings("unchecked")
+    public void passObjects(TextField VideoURI, Method execute, File file) throws IOException, InterruptedException {
+        System.out.println("Bypassing file chooser");
+        this.VideoURI = VideoURI;
+        this.finishMethod = execute;
+        this.closeHook(this.pain);
+        pathBox.setDisable(true);
+        nameBox.setDisable(true);
+        typeBox.setDisable(true);
+        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+        checkHWACCEL();
+        typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
+        preformImport(file);
+    }
 
     private void preformImport(File file) throws IOException, InterruptedException {
         if (file != null) {
+            this.pegGenerator = new FilePegGenerator(file.toURI().toString());
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
             ffmpegOutput.appendText("Determining encoding type\n");
             VideoChecks.checkAllowedSizes(file);

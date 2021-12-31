@@ -71,19 +71,42 @@ public class MainController {
 
     protected void onDragOver(DragEvent event) {
         if (event.getDragboard().hasFiles()) {
-            event.acceptTransferModes(TransferMode.COPY);
+            File file = event.getDragboard().getFiles().get(0);
+            if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")
+                    || file.getName().endsWith(".webm") || file.getName().endsWith(".mov")) {
+                event.acceptTransferModes(TransferMode.COPY);
+            }else {
+                event.acceptTransferModes(TransferMode.NONE);
+            }
+        } else if (event.getDragboard().hasString()) {
+            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")) {
+                event.acceptTransferModes(TransferMode.LINK);
+            }
         }
         event.consume();
     }
 
-    protected void onDragNDrop(DragEvent event) {
+    protected void onDragNDrop(DragEvent event){
         if (event.getDragboard().hasFiles()) {
             File file = event.getDragboard().getFiles().get(0);
-            try {
-                loadFileDirect(file);
-            } catch (IOException | InterruptedException e) {
-                System.out.println("Drag n drop failed");
-                e.printStackTrace();
+            VideoURI.setText(file.toURI().toString());
+            System.out.println("File dropped: " + file.toURI());
+            if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")) {
+                try {
+                    loadFileDirect(file);
+                } catch (IOException | InterruptedException e) {
+                    System.out.println("Drag n drop failed");
+                    e.printStackTrace();
+                }
+            }
+        } else if (event.getDragboard().hasString()) {
+            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")) {
+                try {
+                    loadYoutube(event.getDragboard().getString());
+                } catch (IOException e) {
+                    System.out.println("Drag n drop failed");
+                    e.printStackTrace();
+                }
             }
         }
         event.consume();
@@ -266,7 +289,7 @@ public class MainController {
         stage.show();
         ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
-        compat.bypassFileChooser(file, new go());
+        compat.passObjects(VideoURI, new go(), file);
     }
 
     public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException {
@@ -290,7 +313,11 @@ public class MainController {
         compat.passObjects(VideoURI, new go());
     }
 
-    public void loadYoutube(MouseEvent mouseEvent) throws IOException {
+    public void loadYoutube(MouseEvent mouseEvent) throws IOException{
+        loadYoutube("");
+    }
+
+    public void loadYoutube(String direct) throws IOException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
             if (popOut.getType() == PopOut.popOutType.YoutubeFinderView) {
@@ -308,7 +335,11 @@ public class MainController {
         stage.show();
         YoutubeView youtubeSelectView = fxmlLoader.getController();
         popOuts.add(youtubeSelectView);
-        youtubeSelectView.passObjects(VideoURI, new go());
+        if (direct.equals("")) {
+            youtubeSelectView.passObjects(VideoURI, new go());
+        }else{
+            youtubeSelectView.autoLoad(VideoURI, new go(), direct);
+        }
     }
 
     public void onUncaughtException(Thread thread, Throwable throwable) {

@@ -4,6 +4,7 @@ import EncodingMagic.YoutubePegGenerator;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -38,6 +39,7 @@ public class YoutubeView implements PopOut {
     public ProgressIndicator progressBar;
 
     private boolean isAlive = true;
+    private boolean noWait = false;
     private String mainURI;
     private JSONObject json;
     private String thumbnailURI;
@@ -56,6 +58,15 @@ public class YoutubeView implements PopOut {
         this.closeHook(this.pane);
     }
 
+    public void autoLoad(TextField videoURI, Method finishMethod, String link) throws IOException {
+        this.videoURI = videoURI;
+        this.finishMethod = finishMethod;
+        this.youtubeLinkBox.setText(link);
+        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        noWait = true;
+        this.findVideo(null);
+    }
+
     public void findVideo(MouseEvent mouseEvent) throws IOException {
         System.out.println("Finding video");
         findVideoButton.setDisable(true);
@@ -67,6 +78,24 @@ public class YoutubeView implements PopOut {
                 e.printStackTrace();
             }
         }).start();
+        /* Start animation timer */
+        AnimationTimer animationTimer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (isAlive) {
+                    if (!findVideoButton.isDisabled()) {
+                        try {
+                            submitURI(null);
+                            stop();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            stop();
+                        }
+                    }
+                }
+            }
+        };
+        if(noWait) animationTimer.start();
     }
 
     private void getVideoInfo() throws IOException {
