@@ -57,17 +57,36 @@ public class SettingsWrapper {
         templateJSON = new JSONObject(jsonString.toString());
     }
 
-    private static void saveSettings() {
+    public static void resetSettings() throws IOException {
+        /* Copy template file to settings file */
+        FileWriter writer = new FileWriter(settingsFile);
+        FileReader reader = new FileReader(templateFile);
+        StringBuilder jsonString = new StringBuilder();
+        for (int i = 0; reader.ready(); i++) {
+            jsonString.append((char) reader.read());
+        }
+        writer.write(jsonString.toString());
+        writer.close();
+        reader.close();
+        loadSettings();
+    }
+
+    public static void saveSettings() {
         try {
             FileWriter writer = new FileWriter(settingsFile);
-            writer.write(settingsJSON.toString());
+            writer.write(settingsJSON.toString(2));
             writer.close();
         }catch (IOException ignored){}
     }
 
-    private static void updateSetting(String key, String value){
+
+    public static void updateSetting(String key, JSONObject value) {
         settingsJSON.put(key, value);
-        saveSettings();
+//        saveSettings();
+    }
+
+    public static JSONObject getRawObject(String key) {
+        return settingsJSON.getJSONObject(key);
     }
 
     public static ArrayList<setting> getAllSettings() {

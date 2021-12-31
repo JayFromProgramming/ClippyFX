@@ -28,6 +28,8 @@ public class HelloApplication extends Application {
         stage.show();
         MainController controller = fxmlLoader.getController();
         controller.Pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);
+        controller.Pain.setOnDragOver(controller::onDragOver);
+        controller.Pain.setOnDragDropped(controller::onDragNDrop);
         Thread.setDefaultUncaughtExceptionHandler(controller::onUncaughtException);
     }
 

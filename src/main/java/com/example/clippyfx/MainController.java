@@ -9,9 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -26,7 +24,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
 
 public class MainController {
@@ -65,10 +62,31 @@ public class MainController {
     public void onClose(WindowEvent event) {
         for (PopOut popOut : popOuts) {
             if(!popOut.close()) {
+                System.out.println("Close cancelled because " + popOut.getType() + " is open");
                 event.consume();
                 popOut.getWindow().requestFocus();
             }
         }
+    }
+
+    protected void onDragOver(DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.COPY);
+        }
+        event.consume();
+    }
+
+    protected void onDragNDrop(DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            File file = event.getDragboard().getFiles().get(0);
+            try {
+                loadFileDirect(file);
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Drag n drop failed");
+                e.printStackTrace();
+            }
+        }
+        event.consume();
     }
 
     @FXML
@@ -186,13 +204,12 @@ public class MainController {
     public void barScrubbed(MouseEvent mouseEvent) {
     }
 
-    public void keyPressed(KeyEvent keyEvent) {
+    public void keyPressed(KeyEvent keyEvent) throws IOException, InterruptedException {
         if (keyEvent.getCode() == KeyCode.COMMA) {
-            // Skip back one frame
             new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
         } else if (keyEvent.getCode() == KeyCode.PERIOD) {
             new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
-        } else if (keyEvent.getCode() == KeyCode.SPACE) {
+        } else if (keyEvent.getCode() == KeyCode.B) {
             if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();
                 playPauseButton.setText("Play");
@@ -200,11 +217,29 @@ public class MainController {
                 mediaPlayer.play();
                 playPauseButton.setText("Pause");
             }
+        } else if (keyEvent.getCode() == KeyCode.C) {
+            clipIt();
+        } else if (keyEvent.getCode() == KeyCode.SEMICOLON) {
+            clipStart.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
+        } else if (keyEvent.getCode() == KeyCode.QUOTE) {
+            clipEnd.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
         }
     }
 
     public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
-        // ffmpeg -ss {startTime} -i '{file/URI}' -c:v libvpx-vp9
+        clipIt();
+    }
+
+    public void clipIt() throws IOException, InterruptedException {
+        popOuts.removeIf(popOut -> !popOut.isAlive());
+        for (PopOut popOut : popOuts) {
+            if (popOut.getType() == PopOut.popOutType.ClippingView) {
+                if (popOut.isAlive()) {
+                    popOut.getWindow().requestFocus();
+                    return;
+                }
+            }
+        }
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("clipping-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
@@ -219,9 +254,10 @@ public class MainController {
         ClippingView clippingProgressWindow = fxmlLoader.getController();
         this.pegGenerator.passMetaData(this.fps, this.mediaPlayer.getTotalDuration().toSeconds());
         clippingProgressWindow.passObjects(mediaPlayer, this.pegGenerator);
+        popOuts.add(clippingProgressWindow);
     }
 
-    public void loadFromCommandLine(String[] args) throws IOException, InterruptedException {
+    public void loadFileDirect(File file) throws IOException, InterruptedException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
@@ -230,7 +266,6 @@ public class MainController {
         stage.show();
         ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
-        File file = new File(args[0]);
         compat.bypassFileChooser(file, new go());
     }
 
@@ -325,7 +360,8 @@ public class MainController {
         stage.show();
         SettingsView controller = fxmlLoader.getController();
         popOuts.add(controller);
-        controller.initialize();
+        controller.build();
+        controller.hookHooks();
     }
 
     class go implements Method {

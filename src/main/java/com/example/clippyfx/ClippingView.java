@@ -176,7 +176,7 @@ public class ClippingView implements PopOut {
         this.fps = (float) pegGenerator.getFPS();
         this.pegGenerator = pegGenerator;
         this.totalFrames = (int) pegGenerator.getTotalClipFrames();
-        this.pathBox.setText(SettingsWrapper.getSetting("defaultBasicSavePath").value);
+        this.pathBox.setText(SettingsWrapper.getSetting("defaultAdvancedSavePath").value);
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
 
