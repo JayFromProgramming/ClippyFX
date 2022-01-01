@@ -51,8 +51,10 @@
              <Button fx:id="ejectButton" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
            </buttons>
          </ButtonBar>
-         <Slider fx:id="volumeSlider" layoutX="37.0" layoutY="560.0" onMouseReleased="#volumeSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="50.0" />
-         <Slider fx:id="speedSlider" layoutX="14.0" layoutY="560.0" onMouseReleased="#speedSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="50.0" />
+         <Slider fx:id="volumeSlider" layoutX="37.0" layoutY="560.0" onMouseReleased="#volumeSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="100.0" />
+         <Slider fx:id="speedSlider" layoutX="7.0" layoutY="560.0" max="200.0" min="50.0" onMouseReleased="#speedSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="100.0" />
+         <Text layoutX="10.0" layoutY="598.0" rotate="-90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Volume" />
+         <Text layoutX="-17.0" layoutY="601.0" rotate="-90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Speed" />
       </children>
    </AnchorPane>
 </VBox>

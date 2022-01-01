@@ -17,9 +17,12 @@ public class YoutubePegGenerator implements PegGenerator {
     private final JSONObject youtubeData;
     private double START_TIME;
     private double END_TIME;
+    private double CLIP_SPEED;
+    private double CLIP_VOLUME;
     private double sourceFrameRate;
     private int sourceHeight;
     private int sourceDuration;
+    private double sourceFps;
 
 
     public YoutubePegGenerator(JSONObject youtubeData) {
@@ -88,6 +91,8 @@ public class YoutubePegGenerator implements PegGenerator {
     public void loadClipBounds(double start, double end, double speed, double volume) {
         this.START_TIME = start;
         this.END_TIME = end;
+        this.CLIP_SPEED = speed;
+        this.CLIP_VOLUME = volume;
     }
 
     @Override

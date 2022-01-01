@@ -149,7 +149,6 @@ public class ClippingView implements PopOut {
             clipping = false;
             return;
         }
-        if (Double.parseDouble(fpsSelect.getText()) > fps) fpsSelect.setText(String.valueOf(fps));
         if (nameBox.getText().equals("")) nameBox.setText("clip");
         mediaPlayer.pause();
         System.out.println("Clipping...");

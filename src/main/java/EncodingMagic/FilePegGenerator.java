@@ -18,8 +18,8 @@ public class FilePegGenerator implements PegGenerator {
 
     private String filePath;
     private String tempPath;
-    private double clipSpeed;
-    private double clipVolume;
+    private double CLIP_SPEED;
+    private double CLIP_VOLUME;
     private double sourceFps;
     private int sourceTotalFrames;
     private double START_TIME;
@@ -85,8 +85,8 @@ public class FilePegGenerator implements PegGenerator {
     public void loadClipBounds(double start, double end, double speed, double volume) {
         START_TIME = start;
         END_TIME = end;
-        clipSpeed = speed;
-        clipVolume = volume;
+        CLIP_SPEED = speed;
+        CLIP_VOLUME = volume;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class FilePegGenerator implements PegGenerator {
             af.add("atempo=" + clipSpeed);
             args.fps *= clipSpeed;
         }
-        if (clipVolume != 1.0) af.add("volume=" + clipVolume);
+        if (CLIP_VOLUME != 1.0) af.add("volume=" + CLIP_VOLUME);
         if (args.fps != this.sourceFps) command.append(String.format(" -r %.3f", args.fps));
         if (vf.size() != 0) command.append(" -vf \"").append(StringUtils.joinWith(",", vf.toArray())).append("\"");
         if (af.size() != 0) command.append(" -af \"").append(StringUtils.joinWith(",", af.toArray())).append("\"");
