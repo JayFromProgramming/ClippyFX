@@ -57,6 +57,7 @@ public class MainController {
     public Button ejectButton;
     public Button settingsButton;
     public Slider volumeSlider;
+    public Slider speedSlider;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
@@ -148,7 +149,8 @@ public class MainController {
         mediaView.fitHeightProperty().bind(VideoPain.heightProperty());
         mediaView.setPreserveRatio(true);
         VideoPain.getChildren().add(mediaView);
-        mediaPlayer.setVolume(0.5);
+        mediaPlayer.setVolume(volumeSlider.getValue() / 100);
+        mediaPlayer.setRate(speedSlider.getValue() / 100);
         LoadPane.setVisible(false);
         isPlaying = true;
         timer = new AnimationTimer() {
@@ -297,7 +299,8 @@ public class MainController {
         double end = (clipEnd.getValue() / 100) * mediaPlayer.getTotalDuration().toSeconds();
         System.out.println("Start: " + start);
         System.out.println("End: " + end);
-        this.pegGenerator.loadClipBounds(start, end);
+        this.pegGenerator.loadClipBounds(start, end, speedSlider.getValue() / 100,
+                volumeSlider.getValue() / 100);
         ClippingView clippingProgressWindow = fxmlLoader.getController();
         this.pegGenerator.passMetaData(this.fps, this.mediaPlayer.getTotalDuration().toSeconds());
         clippingProgressWindow.passObjects(mediaPlayer, this.pegGenerator);
@@ -433,6 +436,12 @@ public class MainController {
         stage.setTitle("ClippyFX: Help menu");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void speedSlid(MouseEvent mouseEvent) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setRate(speedSlider.getValue() / 100);
+        }
     }
 
     class go implements Method {

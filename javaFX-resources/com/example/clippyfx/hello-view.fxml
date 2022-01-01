@@ -22,7 +22,7 @@
             <children>
                <AnchorPane fx:id="LoadPane" layoutX="294.0" layoutY="198.0" prefHeight="126.0" prefWidth="267.0">
                   <children>
-                     <TextField fx:id="VideoURI" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
+                     <TextField fx:id="VideoURI" disable="true" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
                      <Button fx:id="goButton" layoutX="217.0" layoutY="85.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" prefHeight="26.0" prefWidth="41.0" text="Go!" />
                      <Button fx:id="vp9LoadButton" layoutX="10.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#loadFile" prefWidth="124.0" text="Advanced File Load" />
                    <Button fx:id="LoadFileButton" layoutX="150.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#openHelp" prefWidth="108.0" text="Help Menu" />
@@ -32,26 +32,27 @@
                </AnchorPane>
             </children>
          </AnchorPane>
-         <ButtonBar layoutX="17.0" layoutY="589.0" prefHeight="40.0" prefWidth="166.0">
+         <ButtonBar layoutX="44.0" layoutY="593.0" prefHeight="40.0" prefWidth="166.0">
            <buttons>
              <Button fx:id="startInsert" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#setStart" text="Set Start" />
                <Button fx:id="endInsert" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#setEnd" text="Set End" />
            </buttons>
          </ButtonBar>
-         <Slider fx:id="clipStart" disable="true" focusTraversable="false" layoutX="213.0" layoutY="566.0" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
-         <Slider fx:id="clipEnd" disable="true" focusTraversable="false" layoutX="213.0" layoutY="609.0" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
-         <Slider fx:id="scrubBar" disable="true" focusTraversable="false" layoutX="213.0" layoutY="589.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
+         <Slider fx:id="clipStart" disable="true" focusTraversable="false" layoutX="234.0" layoutY="566.0" prefHeight="24.0" prefWidth="495.0" showTickMarks="true" />
+         <Slider fx:id="clipEnd" disable="true" focusTraversable="false" layoutX="234.0" layoutY="609.0" prefHeight="24.0" prefWidth="495.0" showTickMarks="true" />
+         <Slider fx:id="scrubBar" disable="true" focusTraversable="false" layoutX="234.0" layoutY="589.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="24.0" prefWidth="495.0" showTickMarks="true" />
          <Button fx:id="clipItButton" disable="true" focusTraversable="false" layoutX="858.0" layoutY="583.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip It!" />
          <Text fx:id="clipStartText" layoutX="729.0" layoutY="578.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" />
          <Text fx:id="scrubBarText" layoutX="729.0" layoutY="600.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
          <Text fx:id="clipEndText" layoutX="729.0" layoutY="621.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />
-         <ButtonBar layoutX="17.0" layoutY="553.0" prefHeight="40.0" prefWidth="172.0">
+         <ButtonBar layoutX="44.0" layoutY="558.0" prefHeight="40.0" prefWidth="171.0">
            <buttons>
                <Button fx:id="playPauseButton" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#playPauseVideo" text="Pause" />
              <Button fx:id="ejectButton" disable="true" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#ejectMedia" text="Eject" />
            </buttons>
          </ButtonBar>
-         <Slider fx:id="volumeSlider" layoutX="7.0" layoutY="556.0" onMouseReleased="#volumeSlid" orientation="VERTICAL" prefHeight="70.0" prefWidth="14.0" value="50.0" />
+         <Slider fx:id="volumeSlider" layoutX="37.0" layoutY="560.0" onMouseReleased="#volumeSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="50.0" />
+         <Slider fx:id="speedSlider" layoutX="14.0" layoutY="560.0" onMouseReleased="#speedSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="50.0" />
       </children>
    </AnchorPane>
 </VBox>

@@ -71,14 +71,14 @@ public class VideoChecks {
     public static String sizeFormatter(Sizes size){
         return switch (size) {
             case Source -> "";
-            case x2160p -> "-vf scale=-1:3840";
-            case x1440p -> "-vf scale=-1:2560";
-            case x1080p -> "-vf scale=-1:1920";
-            case x720p ->  "-vf scale=-1:1280";
-            case x480p ->  "-vf scale=-1:720";
-            case x360p ->  "-vf scale=-1:640";
-            case x240p ->  "-vf scale=-1:480";
-            case x144p ->  "-vf scale=-1:360";
+            case x2160p -> "scale=-1:3840";
+            case x1440p -> "scale=-1:2560";
+            case x1080p -> "scale=-1:1920";
+            case x720p ->  "scale=-1:1280";
+            case x480p ->  "scale=-1:720";
+            case x360p ->  "scale=-1:640";
+            case x240p ->  "scale=-1:480";
+            case x144p ->  "scale=-1:360";
         };
     }
 

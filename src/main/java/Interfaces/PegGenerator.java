@@ -1,5 +1,6 @@
 package Interfaces;
 
+import HelperMethods.PegArgument;
 import HelperMethods.VideoChecks;
 import org.json.JSONObject;
 
@@ -39,22 +40,16 @@ public interface PegGenerator {
 
     void passMetaData(double source_fps, double source_duration);
 
-    void loadClipBounds(double start, double end);
+    void loadClipBounds(double start, double end, double speed, double volume);
 
-    double getTotalClipFrames();
+    double getTotalFrames();
 
     String getPreferredSaveLocation();
 
     /**
-     * @param encoder The type of encoding to use
-     * @param dimensions The output dimensions of the video
-     * @param allow100MB Used to allow files to be up to 100MB in size
-     * @param fps The output fps of the video
-     * @param saveName The name of the file to save the video as
      * @return A FFMPEG command to encode the video
      * @throws IOException Thrown if the FFMPEG command cannot be generated
      */
-    String buildPeg(VideoChecks.Encoders encoder, VideoChecks.Sizes dimensions,
-                    boolean allow100MB, double fps, String saveName) throws IOException;
+    String buildPeg(String savePath, PegArgument args) throws IOException;
 
 }

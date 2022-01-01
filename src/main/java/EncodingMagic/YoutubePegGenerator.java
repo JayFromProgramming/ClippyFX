@@ -1,5 +1,6 @@
 package EncodingMagic;
 
+import HelperMethods.PegArgument;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
@@ -84,13 +85,13 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public void loadClipBounds(double start, double end) {
+    public void loadClipBounds(double start, double end, double speed, double volume) {
         this.START_TIME = start;
         this.END_TIME = end;
     }
 
     @Override
-    public double getTotalClipFrames() {
+    public double getTotalFrames() {
         return sourceFrameRate * sourceDuration;
     }
 
@@ -100,8 +101,11 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public String buildPeg(VideoChecks.Encoders encoder, VideoChecks.Sizes dimensions,
-                           boolean allow100MB, double fps, String saveName) throws IOException {
+    public String buildPeg(String saveName, PegArgument args) throws IOException {
+        VideoChecks.Encoders encoder = args.encoder;
+        VideoChecks.Sizes dimensions = args.dimensions;
+        double fps = args.fps;
+        boolean allow100MB = args.allow100MB;
         JSONArray formats = this.youtubeData.getJSONArray("formats");
         String videoURI = "";
         String audioURI = "";

@@ -20,7 +20,7 @@
   "defaultAllow100MB": {
     "name": "defaultAllow100MB",
     "type": "toggle",
-    "value": "true",
+    "value": "false",
     "description": "Whether or not to allow 100MB files instead of the default 8MB."
   },
   "preferredVideoSize": {

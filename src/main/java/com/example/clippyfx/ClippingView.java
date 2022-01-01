@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import HelperMethods.PegArgument;
 import HelperMethods.VideoChecks;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
@@ -156,8 +157,9 @@ public class ClippingView implements PopOut {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         String fileSaveName = pathBox.getText() + "\\" + nameBox.getText();
         if (clipStart > clipEnd) throw new IllegalArgumentException("Start time cannot be greater than end time.");
-        String command = pegGenerator.buildPeg(this.getEncoder(), this.getSize(), this.sizeCap.isSelected(),
-                Double.parseDouble(this.fpsSelect.getText()), fileSaveName);
+        PegArgument args = new PegArgument(this.getEncoder(), this.getSize(), sizeCap.isSelected(),
+                Double.parseDouble(fpsSelect.getText()));
+        String command = pegGenerator.buildPeg(fileSaveName, args);
         System.out.println(command);
         ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
         builder.redirectErrorStream(true);
@@ -177,7 +179,7 @@ public class ClippingView implements PopOut {
         this.clipEnd = pegGenerator.getEndTime();
         this.fps = (float) pegGenerator.getFPS();
         this.pegGenerator = pegGenerator;
-        this.totalFrames = (int) pegGenerator.getTotalClipFrames();
+        this.totalFrames = (int) pegGenerator.getTotalFrames();
         this.pathBox.setText(pegGenerator.getPreferredSaveLocation());
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
