@@ -5,6 +5,7 @@ import HelperMethods.StreamedCommand;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
+import eu.hansolo.tilesfx.Command;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,7 +24,9 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
@@ -53,6 +56,7 @@ public class MainController {
     public Button vp9LoadButton;
     public Button ejectButton;
     public Button settingsButton;
+    public Slider volumeSlider;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
@@ -126,11 +130,11 @@ public class MainController {
     }
 
     @FXML
-    protected void onMediaLoad(MouseEvent ignored) throws IOException {
+    protected void onMediaLoad(MouseEvent ignored) throws IOException, URISyntaxException {
         loadMedia(new FilePegGenerator());
     }
 
-    protected void loadMedia(PegGenerator pegGenerator) throws IOException {
+    protected void loadMedia(PegGenerator pegGenerator) throws IOException, URISyntaxException {
         System.out.println("Media loading...");
         setEnabledUI(true);
         this.pegGenerator = pegGenerator;
@@ -167,7 +171,8 @@ public class MainController {
         if (pegGenerator.getType() == PegGenerator.PegType.Youtube) {
             fps = 30;
         } else {
-            String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + VideoURI.getText().substring(6) + "\"";
+            URI uri_object = new URI(VideoURI.getText());
+            String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + Paths.get(uri_object) + "\"";
             fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         }
         System.out.println("FPS: " + fps);
@@ -184,6 +189,7 @@ public class MainController {
         endInsert.setDisable(!enabled);
         scrubBar.setDisable(!enabled);
         ejectButton.setDisable(!enabled);
+        volumeSlider.setDisable(!enabled);
     }
 
     public void ejectMedia(MouseEvent mouseEvent) {
@@ -241,24 +247,29 @@ public class MainController {
     }
 
     public void keyPressed(KeyEvent keyEvent) throws IOException, InterruptedException {
-        if (keyEvent.getCode() == KeyCode.COMMA) {
-            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
-        } else if (keyEvent.getCode() == KeyCode.PERIOD) {
-            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
-        } else if (keyEvent.getCode() == KeyCode.B) {
-            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                mediaPlayer.pause();
-                playPauseButton.setText("Play");
-            } else {
+        switch (keyEvent.getCode()) {
+            case LEFT -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1))).start();
+            case RIGHT -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1))).start();
+            case COMMA -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
+            case PERIOD -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
+            case SPACE -> {
+                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                    mediaPlayer.pause();
+                    playPauseButton.setText("Play");
+                } else {
+                    mediaPlayer.play();
+                    playPauseButton.setText("Pause");
+                }
+            }
+            case ENTER -> clipIt();
+            case SEMICOLON -> clipStart.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
+            case QUOTE -> clipEnd.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
+            case P ->{
+                new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()
+                        * (clipStart.getValue() / 100)))).start();
                 mediaPlayer.play();
                 playPauseButton.setText("Pause");
             }
-        } else if (keyEvent.getCode() == KeyCode.C) {
-            clipIt();
-        } else if (keyEvent.getCode() == KeyCode.SEMICOLON) {
-            clipStart.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
-        } else if (keyEvent.getCode() == KeyCode.QUOTE) {
-            clipEnd.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
         }
     }
 
@@ -408,12 +419,32 @@ public class MainController {
         controller.hookHooks();
     }
 
+    @FXML
+    public void volumeSlid(MouseEvent mouseEvent) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setVolume(volumeSlider.getValue() / 100);
+        }
+    }
+
+    public void openHelp(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("help-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Help menu");
+        stage.setScene(scene);
+        stage.show();
+    }
+
     class go implements Method {
 
         @Override
         public void execute(Object data) throws IOException {
             Pain.getScene().getWindow().requestFocus();
-            loadMedia((PegGenerator) data);
+            try {
+                loadMedia((PegGenerator) data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }

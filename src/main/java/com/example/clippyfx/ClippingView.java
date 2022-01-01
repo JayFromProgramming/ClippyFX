@@ -118,11 +118,13 @@ public class ClippingView implements PopOut {
                         }
                     } catch (IOException ignored) {
                     }
+                    progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
                 } else {
                     ffmpegOutput.appendText("Clipping successful.");
                     System.out.println("Clipping successful.");
                     progressBar.setProgress(1);
                 }
+                clipItButton.setDisable(true);
                 stop();
             }
         }
@@ -176,7 +178,7 @@ public class ClippingView implements PopOut {
         this.fps = (float) pegGenerator.getFPS();
         this.pegGenerator = pegGenerator;
         this.totalFrames = (int) pegGenerator.getTotalClipFrames();
-        this.pathBox.setText(SettingsWrapper.getSetting("defaultAdvancedSavePath").value);
+        this.pathBox.setText(pegGenerator.getPreferredSaveLocation());
 
         this.sizeCap.setSelected(SettingsWrapper.getSetting("defaultAllow100MB").bool());
 

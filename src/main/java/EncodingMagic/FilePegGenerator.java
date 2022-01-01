@@ -1,5 +1,6 @@
 package EncodingMagic;
 
+import HelperMethods.SettingsWrapper;
 import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
@@ -86,6 +87,11 @@ public class FilePegGenerator implements PegGenerator {
     @Override
     public double getTotalClipFrames() {
         return sourceTotalFrames;
+    }
+
+    @Override
+    public String getPreferredSaveLocation() {
+        return SettingsWrapper.getSetting("defaultAdvancedSavePath").value;
     }
 
     private boolean checkDuplicates(String savePath){

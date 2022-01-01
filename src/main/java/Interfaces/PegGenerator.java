@@ -43,6 +43,8 @@ public interface PegGenerator {
 
     double getTotalClipFrames();
 
+    String getPreferredSaveLocation();
+
     /**
      * @param encoder The type of encoding to use
      * @param dimensions The output dimensions of the video

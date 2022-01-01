@@ -1,5 +1,6 @@
 package EncodingMagic;
 
+import HelperMethods.SettingsWrapper;
 import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
@@ -91,6 +92,11 @@ public class YoutubePegGenerator implements PegGenerator {
     @Override
     public double getTotalClipFrames() {
         return sourceFrameRate * sourceDuration;
+    }
+
+    @Override
+    public String getPreferredSaveLocation() {
+        return SettingsWrapper.getSetting("defaultYoutubeSavePath").value;
     }
 
     @Override
