@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class ImporterView implements PopOut {
@@ -204,7 +205,7 @@ public class ImporterView implements PopOut {
         }
     }
 
-    public void bypassFileChooser(File file, Method execute) throws IOException, InterruptedException {
+    public void bypassFileChooser(File file, Method execute) throws IOException, InterruptedException, URISyntaxException {
         this.finishMethod = execute;
         this.closeHook(this.pain);
         pathBox.setDisable(true);
@@ -216,7 +217,7 @@ public class ImporterView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI, Method execute) throws IOException, InterruptedException {
+    public void passObjects(TextField VideoURI, Method execute) throws IOException, InterruptedException, URISyntaxException {
 
         this.VideoURI = VideoURI;
         this.finishMethod = execute;
@@ -242,7 +243,7 @@ public class ImporterView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI, Method execute, File file) throws IOException, InterruptedException {
+    public void passObjects(TextField VideoURI, Method execute, File file) throws IOException, InterruptedException, URISyntaxException {
         System.out.println("Bypassing file chooser");
         this.VideoURI = VideoURI;
         this.finishMethod = execute;
@@ -256,7 +257,7 @@ public class ImporterView implements PopOut {
         preformImport(file);
     }
 
-    private void preformImport(File file) throws IOException, InterruptedException {
+    private void preformImport(File file) throws IOException, InterruptedException, URISyntaxException {
         if (file != null) {
             this.pegGenerator = new FilePegGenerator(file.toURI().toString());
             ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");

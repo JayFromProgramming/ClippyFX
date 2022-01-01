@@ -5,6 +5,9 @@ import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.json.JSONObject;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -20,10 +23,9 @@ public class FilePegGenerator implements PegGenerator {
 
     public FilePegGenerator(){}
 
-    public FilePegGenerator(String uri){
-        if (uri.contains("file:/")) {
-            this.filePath = uri.replace("file:/", "").replace("/", "\\");
-        }else this.filePath = uri;
+    public FilePegGenerator(String uri) throws URISyntaxException {
+        URI uri_object = new URI(uri);
+        this.filePath = String.valueOf(Paths.get(uri_object));
     }
 
     @Override
@@ -52,9 +54,12 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public void setVideoFile(String uri) {
-        if (uri.contains("file:/")) {
-            this.filePath = uri.replace("file:/", "").replace("/", "\\");
-        }else this.filePath = uri;
+        try {
+            URI uri_object = new URI(uri);
+            this.filePath = String.valueOf(Paths.get(uri_object));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public void setTempFile(String path) {

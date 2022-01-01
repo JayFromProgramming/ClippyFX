@@ -64,7 +64,7 @@ public class SettingsView implements PopOut {
 
     public void settingOptionBuilder(SettingsWrapper.setting setting, int yOffset, Pane parent) {
         Text fieldName = new Text(setting.name);
-        fieldName.setText(setting.name);
+        fieldName.setText(setting.name + ": " + setting.description);
         fieldName.setLayoutY(yOffset);
         OptionWrapper option = new OptionWrapper();
         option.name = setting.name;
@@ -194,7 +194,7 @@ public class SettingsView implements PopOut {
     }
 
     public void onCancelPressed(MouseEvent mouseEvent) {
-        checkUnsaved();
+        if(checkUnsaved()) close();
     }
 
 

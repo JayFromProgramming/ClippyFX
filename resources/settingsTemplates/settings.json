@@ -3,25 +3,25 @@
     "name": "defaultAdvancedLoadPath",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The path to save the video to."
+    "description": "The default path to load files from."
   },
   "defaultAdvancedSavePath": {
     "name": "defaultAdvancedSavePath",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The path to save the video to."
+    "description": "The default path to save files to."
   },
   "defaultYoutubeSavePath": {
     "name": "defaultYoutubeSavePath",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The path to save the video to."
+    "description": "The default path to save youtube clips to."
   },
   "defaultAllow100MB": {
     "name": "defaultAllow100MB",
     "type": "toggle",
     "value": "true",
-    "description": "Whether or not to allow 100MB files."
+    "description": "Whether or not to allow 100MB files instead of the default 8MB."
   },
   "preferredVideoSize": {
     "name": "preferredVideoSize",

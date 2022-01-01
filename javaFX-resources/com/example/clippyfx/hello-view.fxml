@@ -25,7 +25,7 @@
                      <TextField fx:id="VideoURI" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
                      <Button fx:id="goButton" layoutX="217.0" layoutY="85.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" prefHeight="26.0" prefWidth="41.0" text="Go!" />
                      <Button fx:id="vp9LoadButton" layoutX="10.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#loadFile" prefWidth="124.0" text="Advanced File Load" />
-                   <Button fx:id="LoadFileButton" disable="true" layoutX="150.0" layoutY="50.0" mnemonicParsing="false" prefWidth="108.0" text="Unused" />
+                   <Button fx:id="LoadFileButton" disable="true" layoutX="150.0" layoutY="50.0" mnemonicParsing="false" prefWidth="108.0" text="Help Menu" />
                      <Button fx:id="youtubeButton" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" text="Youtube Video Load" />
                    <Button fx:id="settingsButton" layoutX="150.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#openSettings" text="Program Settings" />
                   </children>
@@ -38,9 +38,9 @@
                <Button fx:id="endInsert" disable="true" mnemonicParsing="false" onMouseClicked="#setEnd" text="Set End" />
            </buttons>
          </ButtonBar>
-         <Slider fx:id="clipStart" layoutX="213.0" layoutY="566.0" prefHeight="14.0" prefWidth="515.0" />
-         <Slider fx:id="clipEnd" layoutX="213.0" layoutY="609.0" prefHeight="14.0" prefWidth="515.0" />
-         <Slider fx:id="scrubBar" layoutX="213.0" layoutY="589.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="14.0" prefWidth="515.0" />
+         <Slider fx:id="clipStart" disable="true" layoutX="213.0" layoutY="566.0" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
+         <Slider fx:id="clipEnd" disable="true" layoutX="213.0" layoutY="609.0" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
+         <Slider fx:id="scrubBar" disable="true" layoutX="213.0" layoutY="589.0" onMouseClicked="#barScrubbed" onMousePressed="#scrubPressed" onMouseReleased="#scrubReleased" prefHeight="14.0" prefWidth="515.0" showTickMarks="true" />
          <Button fx:id="clipItButton" disable="true" layoutX="858.0" layoutY="583.0" mnemonicParsing="false" onMouseClicked="#clipIt" text="Clip It!" />
          <Text fx:id="clipStartText" layoutX="729.0" layoutY="578.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You shouldn't see this" />
          <Text fx:id="scrubBarText" layoutX="729.0" layoutY="600.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You Shouldn't see this" />

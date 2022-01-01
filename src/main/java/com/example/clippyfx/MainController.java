@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 
@@ -74,15 +75,16 @@ public class MainController {
             File file = event.getDragboard().getFiles().get(0);
             if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")
                     || file.getName().endsWith(".webm") || file.getName().endsWith(".mov")) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-            }else {
-                event.acceptTransferModes(TransferMode.NONE);
+                event.acceptTransferModes(TransferMode.COPY);
             }
         } else if (event.getDragboard().hasString()) {
-            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")
-                    || event.getDragboard().getString().startsWith("https://youtu.be/")) {
+            if (event.getDragboard().getString().contains("youtube.com/watch?v=")
+                    || event.getDragboard().getString().contains("youtu.be/")) {
                 event.acceptTransferModes(TransferMode.LINK);
-            }
+            } else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
+                    (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
+                event.acceptTransferModes(TransferMode.NONE);
+            } else event.acceptTransferModes(TransferMode.NONE);
         }
         event.consume();
     }
@@ -92,20 +94,30 @@ public class MainController {
             File file = event.getDragboard().getFiles().get(0);
             VideoURI.setText(file.toURI().toString());
             System.out.println("File dropped: " + file.toURI());
-            if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")) {
+            if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")
+                    || file.getName().endsWith(".webm") || file.getName().endsWith(".mov")) {
                 try {
                     loadFileDirect(file);
-                } catch (IOException | InterruptedException e) {
-                    System.out.println("Drag n drop failed");
+                } catch (IOException | InterruptedException | URISyntaxException e) {
+                    System.out.println("File dragNdrop failed");
                     e.printStackTrace();
                 }
             }
         } else if (event.getDragboard().hasString()) {
-            if (event.getDragboard().getString().startsWith("https://www.youtube.com/watch?v=")) {
+            if (event.getDragboard().getString().contains("youtube.com/watch?v=")
+                    || event.getDragboard().getString().contains("youtu.be/")) {
                 try {
                     loadYoutube(event.getDragboard().getString());
                 } catch (IOException e) {
-                    System.out.println("Drag n drop failed");
+                    System.out.println("Youtube link dragNdrop failed");
+                    e.printStackTrace();
+                }
+            }else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
+                    (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
+                try {
+                    loadFileDirect(new File(event.getDragboard().getString()));
+                } catch (IOException | InterruptedException | URISyntaxException e) {
+                    System.out.println("Discord link dragNdropp failed");
                     e.printStackTrace();
                 }
             }
@@ -281,7 +293,7 @@ public class MainController {
         popOuts.add(clippingProgressWindow);
     }
 
-    public void loadFileDirect(File file) throws IOException, InterruptedException {
+    public void loadFileDirect(File file) throws IOException, InterruptedException, URISyntaxException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
@@ -293,7 +305,7 @@ public class MainController {
         compat.passObjects(VideoURI, new go(), file);
     }
 
-    public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException {
+    public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException, URISyntaxException {
         popOuts.removeIf(popOut -> !popOut.isAlive());
         for (PopOut popOut : popOuts) {
             if (popOut.getType() == PopOut.popOutType.ConverterView) {
