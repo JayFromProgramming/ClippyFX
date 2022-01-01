@@ -1,5 +1,6 @@
 package com.example.clippyfx;
 
+import HelperMethods.StreamedCommand;
 import HelperMethods.VideoChecks;
 import HelperMethods.SettingsWrapper;
 import javafx.application.Application;
@@ -19,6 +20,13 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
+        String check = StreamedCommand.getCommandOutput("ffmpeg -version");
+        if (check.contains("ffmpeg version")) {
+            System.out.println("FFmpeg is installed");
+        } else {
+            System.out.println("FFmpeg is not installed");
+            System.exit(-27);
+        }
         new Thread(VideoChecks::checkEncoders).start();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
