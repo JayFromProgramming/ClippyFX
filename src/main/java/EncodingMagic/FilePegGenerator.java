@@ -103,7 +103,8 @@ public class FilePegGenerator implements PegGenerator {
     public String buildPeg(String savePath, PegArgument args){
         System.out.println("Building Peg");
         StringBuilder command = new StringBuilder();
-        command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -to %.2f ", START_TIME, filePath, END_TIME));
+        command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -to %.2f ", START_TIME, filePath,
+                (END_TIME - START_TIME) * (1 / CLIP_SPEED)));
         command.append(switch (args.encoder) {
             case libx264 -> buildCPUX264Peg(args);
             case h264_nvenc -> buildNVENCX264Peg(args);
@@ -116,16 +117,21 @@ public class FilePegGenerator implements PegGenerator {
         ArrayList<String> vf = new ArrayList<>();
         ArrayList<String> af = new ArrayList<>();
         if (args.dimensions != VideoChecks.Sizes.Source) vf.add(VideoChecks.sizeFormatter(args.dimensions));
-        if (clipSpeed != 1.0) {
-            vf.add("setpts=" + clipSpeed + "*PTS");
-            af.add("atempo=" + clipSpeed);
-            args.fps *= clipSpeed;
+        if (CLIP_SPEED != 1.0) {
+            vf.add("setpts=" + 1 / CLIP_SPEED + "*PTS");
+            af.add("atempo=" + CLIP_SPEED);
+            args.fps *= CLIP_SPEED;
         }
         if (CLIP_VOLUME != 1.0) af.add("volume=" + CLIP_VOLUME);
         if (args.fps != this.sourceFps) command.append(String.format(" -r %.3f", args.fps));
         if (vf.size() != 0) command.append(" -vf \"").append(StringUtils.joinWith(",", vf.toArray())).append("\"");
         if (af.size() != 0) command.append(" -af \"").append(StringUtils.joinWith(",", af.toArray())).append("\"");
-        command.append(" \"").append(savePath).append("\"");
+        String extension = switch (args.encoder){
+            case libx264, h264_nvenc, h264_amf -> ".mp4";
+            case h264_qsv -> throw new NotImplementedException("QSV is not currently supported (and never will be)");
+            case libvpx_vp9 -> ".webm";
+        };
+        command.append(" \"").append(savePath).append(extension).append("\"");
         return command.toString();
     }
 
