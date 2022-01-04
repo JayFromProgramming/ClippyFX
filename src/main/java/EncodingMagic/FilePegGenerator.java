@@ -177,6 +177,6 @@ public class FilePegGenerator implements PegGenerator {
             default -> throw new IllegalStateException("Unexpected value: " + (args.dimensions == VideoChecks.Sizes.Source ?
                     args.dimensions : VideoChecks.getSize()));
         };
-        return String.format("-c:v libvpx-vp9 -crf:v %s -c:a libopus -b:a 96k", crf);
+        return String.format("-c:v libvpx-vp9 -crf:v %s -cpu-used 1 -row-mt 1 -c:a libopus -b:a 96k", crf);
     }
 }
