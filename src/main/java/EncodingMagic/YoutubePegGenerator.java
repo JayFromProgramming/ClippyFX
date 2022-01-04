@@ -5,6 +5,7 @@ import HelperMethods.SettingsWrapper;
 import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -106,11 +107,7 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public String buildPeg(String saveName, PegArgument args) throws IOException {
-        VideoChecks.Encoders encoder = args.encoder;
-        VideoChecks.Sizes dimensions = args.dimensions;
-        double fps = args.fps;
-        boolean allow100MB = args.allow100MB;
+    public String buildPeg(String savePath, PegArgument args) throws IOException {
         JSONArray formats = this.youtubeData.getJSONArray("formats");
         String videoURI = "";
         String audioURI = "";
@@ -128,24 +125,45 @@ public class YoutubePegGenerator implements PegGenerator {
                 break;
             }
         }
-        return switch (encoder) {
-            case libx264 -> buildCPUX264Peg(videoURI, audioURI, dimensions, allow100MB, fps, this.START_TIME, this.END_TIME, saveName);
-            case h264_nvenc -> buildNVENCX264Peg(videoURI, audioURI, dimensions, allow100MB, fps, this.START_TIME, this.END_TIME, saveName);
-            case h264_amf -> buildAMFX264Peg(videoURI, audioURI, dimensions, allow100MB, fps, this.START_TIME, this.END_TIME, saveName);
-            case h264_qsv -> throw new NotImplementedException("QSV is not currently supported");
-            case libvpx_vp9 -> buildVP9Peg(videoURI, audioURI, dimensions, allow100MB, fps, this.START_TIME, this.END_TIME, saveName);
+        StringBuilder command = new StringBuilder();
+        command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f ", START_TIME, videoURI,
+            START_TIME, audioURI, (END_TIME - START_TIME) * (1 / CLIP_SPEED)));
+        command.append(switch (args.encoder) {
+            case libx264 -> buildCPUX264Peg(args);
+            case h264_nvenc -> buildNVENCX264Peg(args);
+            case h264_amf -> buildAMFX264Peg(args);
+            case h264_qsv -> throw new NotImplementedException("QSV is not currently supported (and never will be)");
+            case libvpx_vp9 -> buildVP9Peg(args);
+        });
+        double bitrate = args.allow100MB ? 8e8 / (END_TIME - START_TIME) : 6.4e7 / (END_TIME - START_TIME);
+        command.append(String.format(" -b:v %.2f -maxrate:v %.2f", bitrate / 1.392, bitrate));
+        ArrayList<String> vf = new ArrayList<>();
+        ArrayList<String> af = new ArrayList<>();
+        if (args.dimensions != VideoChecks.Sizes.Source) vf.add(VideoChecks.sizeFormatter(args.dimensions));
+        if (CLIP_SPEED != 1.0) {
+            vf.add("setpts=" + 1 / CLIP_SPEED + "*PTS");
+            af.add("atempo=" + CLIP_SPEED);
+            args.fps *= CLIP_SPEED;
+        }
+        if (CLIP_VOLUME != 1.0) af.add("volume=" + CLIP_VOLUME);
+        if (args.fps != this.sourceFps) command.append(String.format(" -r %.3f", args.fps));
+        if (vf.size() != 0) command.append(" -vf \"").append(StringUtils.joinWith(",", vf.toArray())).append("\"");
+        if (af.size() != 0) command.append(" -af \"").append(StringUtils.joinWith(",", af.toArray())).append("\"");
+        String extension = switch (args.encoder){
+            case libx264, h264_nvenc, h264_amf -> ".mp4";
+            case h264_qsv -> throw new NotImplementedException("QSV is not currently supported (and never will be)");
+            case libvpx_vp9 -> ".webm";
         };
+        command.append(" \"").append(savePath).append(extension).append("\"");
+        return command.toString();
     }
 
-    private String buildAMFX264Peg(String videoURI, String audioURI, VideoChecks.Sizes size, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
-        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f -c:v h264_amf -c:a aac -quality:v 0 -rc:v vbr_peak -b:v %.3f -maxrate:v %.3f -b:a 128k -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, videoURI, startTime, audioURI, endTime - startTime, bitrate / 1.4,
-                bitrate, saveName);
+    private String buildAMFX264Peg(PegArgument args) {
+        return "-c:v h264_amf -quality:v 0 -rc:v vbr_peak -c:a aac -b:a 128k";
     }
 
-    private String buildNVENCX264Peg(String videoURI, String audioURI, VideoChecks.Sizes size, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
-        int crf = switch (size != VideoChecks.Sizes.Source ? size : VideoChecks.getSize()) {
+    private String buildNVENCX264Peg(PegArgument args) {
+        int crf = switch (args.dimensions != VideoChecks.Sizes.Source ? args.dimensions : VideoChecks.getSize()) {
             case x2160p -> 12;
             case x1440p -> 21;
             case x1080p -> 27;
@@ -154,16 +172,29 @@ public class YoutubePegGenerator implements PegGenerator {
             case x360p  -> 33;
             case x240p  -> 34;
             case x144p  -> 35;
-            default -> throw new IllegalStateException("Unexpected value: " + (size == VideoChecks.Sizes.Source ? size : VideoChecks.getSize()));
+            default -> throw new IllegalStateException("Unexpected value: " + (args.dimensions == VideoChecks.Sizes.Source ? args.dimensions : VideoChecks.getSize()));
         };
-        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f -c:v h264_nvenc -c:a aac %s -preset:v p6 -rc-lookahead 4 -cq %s -b:v %.3f -maxrate:v %.3f -r %.3f -b:a 128k -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, videoURI, startTime, audioURI, endTime - startTime, VideoChecks.sizeFormatter(size), crf, bitrate / 1.4, bitrate, fps, saveName);
+        return String.format("-c:v h264_nvenc -preset:v p6 -rc-lookahead 4 -cq %s -c:a aac -b:a 128k", crf);
     }
 
-    private String buildCPUX264Peg(String videoURI, String audioURI, VideoChecks.Sizes dimensions, boolean allow100MB, double fps, double startTime, double endTime, String saveName) {
-        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
-        int crf = switch (dimensions != VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()) {
+    private String buildCPUX264Peg(PegArgument args) {
+        int crf = switch (args.dimensions != VideoChecks.Sizes.Source ? args.dimensions : VideoChecks.getSize()) {
+            case x2160p -> 12;
+            case x1440p -> 21;
+            case x1080p -> 27;
+            case x720p  -> 29;
+            case x480p  -> 31;
+            case x360p  -> 33;
+            case x240p  -> 34;
+            case x144p  -> 35;
+            default -> throw new IllegalStateException("Unexpected value: " + (args.dimensions == VideoChecks.Sizes.Source
+                    ? args.dimensions : VideoChecks.getSize()));
+        };
+        return String.format("-c:v libx264 -crf:v %s -bufsize:v 64k -c:a aac -b:a 128k", crf);
+    }
+
+    private String buildVP9Peg(PegArgument args) {
+        int crf = switch (args.dimensions != VideoChecks.Sizes.Source ? args.dimensions : VideoChecks.getSize()) {
             case x2160p -> 15;
             case x1440p -> 24;
             case x1080p -> 31;
@@ -172,29 +203,9 @@ public class YoutubePegGenerator implements PegGenerator {
             case x360p  -> 36;
             case x240p  -> 37;
             case x144p  -> 38;
-            default -> throw new IllegalStateException("Unexpected value: " + (dimensions == VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()));
+            default -> throw new IllegalStateException("Unexpected value: " + (args.dimensions == VideoChecks.Sizes.Source ?
+                    args.dimensions : VideoChecks.getSize()));
         };
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f -c:v libx264 -c:a libopus -crf:v %s -b:v %.3f -maxrate:v %.3f -b:a 96k -r %.3f %s -y \"%s.mp4\"";
-        return String.format(baseCommand, startTime, videoURI, startTime, audioURI, endTime - startTime, crf, bitrate / 1.4, bitrate, fps,
-                VideoChecks.sizeFormatter(dimensions), saveName);
-    }
-
-    private String buildVP9Peg(String videoURI, String audioURI, VideoChecks.Sizes dimensions, boolean allow100MB, double fps, double startTime,
-                               double endTime, String saveName) {
-        int crf = switch (dimensions != VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()) {
-            case x2160p -> 15;
-            case x1440p -> 24;
-            case x1080p -> 31;
-            case x720p  -> 32;
-            case x480p  -> 34;
-            case x360p  -> 36;
-            case x240p  -> 37;
-            case x144p  -> 38;
-            default -> throw new IllegalStateException("Unexpected value: " + (dimensions == VideoChecks.Sizes.Source ? dimensions : VideoChecks.getSize()));
-        };
-        float bitrate = (float) (allow100MB ? 8e8 / (endTime - startTime) : 6.4e7 / (endTime - startTime));
-        String baseCommand = "ffmpeg -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f -c:v libvpx-vp9 -c:a libopus -crf:v %s -b:v %.3f -maxrate:v %.3f -b:a 96k -r %.3f %s -y \"%s.webm\"";
-        return String.format(baseCommand, startTime, videoURI, startTime, audioURI, endTime - startTime, crf, bitrate / 1.4, bitrate, fps,
-                VideoChecks.sizeFormatter(dimensions), saveName);
+        return String.format("-c:v libvpx-vp9 -crf:v %s -cpu-used 1 -row-mt 1 -c:a libopus -b:a 96k", crf);
     }
 }
