@@ -84,11 +84,15 @@ public class VideoChecks {
 
     public static void checkAllowedSizes(File file) throws IOException {
         System.out.println("Detecting allowed sizes...");
-        String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i \"" + file.getAbsolutePath() + "\"");
-        checkAllowedSizes(hSize);
+        checkAllowedSizes(file.getAbsolutePath());
     }
 
-    public static void checkAllowedSizes(String hSize) {
+    public static void checkAllowedSizes(String path) throws IOException {
+        String hSize = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=s=x:p=0 -i \"" + path + "\"");
+        calcAllowedSizes(hSize);
+    }
+
+    public static void calcAllowedSizes(String hSize) {
         HEIGHT = Integer.parseInt(hSize);
         AVAILABLE_SIZES.clear();
         AVAILABLE_SIZES.add(Sizes.Source);

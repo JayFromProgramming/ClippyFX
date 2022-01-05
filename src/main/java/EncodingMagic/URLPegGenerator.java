@@ -6,59 +6,55 @@ import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class YoutubePegGenerator implements PegGenerator {
 
+public class URLPegGenerator implements PegGenerator {
 
-    private final JSONObject youtubeData;
-    private double START_TIME;
-    private double END_TIME;
+    private String fileLink;
     private double CLIP_SPEED;
     private double CLIP_VOLUME;
-    private double sourceFrameRate;
-    private int sourceHeight;
-    private int sourceDuration;
     private double sourceFps;
+    private int sourceTotalFrames;
+    private double START_TIME;
+    private double END_TIME;
     public int cropX1;
     public int cropX2;
     public int cropY1;
     public int cropY2;
 
+    public URLPegGenerator(){}
 
-    public YoutubePegGenerator(JSONObject youtubeData) {
-        this.youtubeData = youtubeData;
+    public URLPegGenerator(String url) throws URISyntaxException {
+        System.out.println("FilePegGenerator: " + uri);
+        URI uri_object = new URI(uri);
+        this.fileLink = String.valueOf(Paths.get(uri_object));
     }
-
 
     @Override
     public PegType getType() {
-        return PegType.Youtube;
+        return PegType.URI;
     }
 
     @Override
-    public double getStartTime() {
-        return START_TIME;
-    }
+    public double getStartTime() {return START_TIME;}
 
     @Override
-    public double getEndTime() {
-        return END_TIME;
-    }
+    public double getEndTime() {return END_TIME;}
 
     @Override
-    public double getFPS() {
-        return sourceFrameRate;
-    }
+    public double getFPS() {return sourceFps;}
 
     @Override
     public String getLocation() {
-        return null;
+        return fileLink;
     }
 
     @Override
@@ -73,94 +69,72 @@ public class YoutubePegGenerator implements PegGenerator {
 
     @Override
     public File getFile() {
-        return null;
+        throw new UnsupportedOperationException("This method is not supported by the URIPegGenerator");
     }
 
     @Override
-    public ArrayList<String> getEncoders() {return VideoChecks.getEncodersString();}
+    public ArrayList<String> getEncoders() {
+        return VideoChecks.getEncodersString();
+    }
 
     @Override
     public ArrayList<String> getSizes() {
-        JSONArray formats = this.youtubeData.getJSONArray("formats");
-        int height = 0;
-        for (int i = formats.length() - 1; i >= 0; i--){
-            if (!formats.getJSONObject(i).getString("vcodec").equals("none") &&
-                    formats.getJSONObject(i).getString("acodec").equals("none")){
-                height = formats.getJSONObject(i).getInt("height");
-                break;
-            }
-        }
-        this.sourceHeight = height;
-        System.out.println("Highest quality: " + this.sourceHeight);
-        VideoChecks.calcAllowedSizes(String.valueOf(height));
         return VideoChecks.getAllowedSizesString();
     }
 
     @Override
     public void setVideoFile(String uri) {
-        throw new UnsupportedOperationException("This method is not supported by the YoutubePegGenerator");
+        try {
+            URI uri_object = new URI(uri);
+            this.fileLink = String.valueOf(Paths.get(uri_object));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    @Deprecated
     public void setVideoYT(JSONObject youtubeData) {
-        // lmao I'm lazy as fuck
+        throw new UnsupportedOperationException("This method is not supported by the FilePegGenerator");
     }
 
     @Override
     public void passMetaData(double source_fps, double source_duration) {
-       this.sourceDuration = this.youtubeData.getInt("duration");
-       this.sourceFrameRate = this.youtubeData.getInt("fps");
+        this.sourceFps = source_fps;
+        this.sourceTotalFrames = (int) (source_duration * sourceFps);
     }
 
     @Override
     public void loadClipBounds(double start, double end, double speed, double volume) {
-        this.START_TIME = start;
-        this.END_TIME = end;
-        this.CLIP_SPEED = speed;
-        this.CLIP_VOLUME = volume;
+        START_TIME = start;
+        END_TIME = end;
+        CLIP_SPEED = speed;
+        CLIP_VOLUME = volume;
     }
 
     @Override
     public void setClipCrop(int x1, int x2, int y1, int y2) {
-        this.cropX1 = x1;
-        this.cropX2 = x2;
-        this.cropY1 = y1;
-        this.cropY2 = y2;
+        cropX1 = x1;
+        cropX2 = x2;
+        cropY1 = y1;
+        cropY2 = y2;
     }
 
     @Override
     public double getTotalFrames() {
-        return sourceFrameRate * sourceDuration;
+        return sourceTotalFrames;
     }
 
     @Override
     public String getPreferredSaveLocation() {
-        return SettingsWrapper.getSetting("defaultYoutubeSavePath").value;
+        return SettingsWrapper.getSetting("defaultAdvancedSavePath").value;
     }
 
     @Override
-    public String buildPeg(String savePath, PegArgument args){
-        JSONArray formats = this.youtubeData.getJSONArray("formats");
-        String videoURI = "";
-        String audioURI = "";
-        for (int i = formats.length() - 1; i >= 0; i--){ // Stream formats are already sorted by quality, so we find
-            if (!formats.getJSONObject(i).getString("vcodec").equals("none") && // the first stream that has only video
-                    formats.getJSONObject(i).getString("acodec").equals("none")){ // as this will be the highest quality video format
-                videoURI = formats.getJSONObject(i).getString("url");
-                break;
-            }
-        }
-        for (int i = formats.length() - 1; i >= 0; i--){ // Stream formats are already sorted by quality, so we find
-            if (formats.getJSONObject(i).getString("vcodec").equals("none") && // the first stream that has only audio
-                    !formats.getJSONObject(i).getString("acodec").equals("none")){ // as this will be the highest quality audio format
-                audioURI = formats.getJSONObject(i).getString("url");
-                break;
-            }
-        }
+    public String buildPeg(String savePath, PegArgument args) throws IOException {
+        System.out.println("Building Peg");
         StringBuilder command = new StringBuilder();
-        command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -ss %.2f -i \"%s\" -map 0:0 -map 1:0 -to %.2f ", START_TIME, videoURI,
-            START_TIME, audioURI, (END_TIME - START_TIME) * (1 / CLIP_SPEED)));
+        command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -to %.2f ", START_TIME, fileLink,
+                (END_TIME - START_TIME) * (1 / CLIP_SPEED)));
         command.append(switch (args.encoder) {
             case libx264 -> buildCPUX264Peg(args);
             case h264_nvenc -> buildNVENCX264Peg(args);

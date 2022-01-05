@@ -4,6 +4,7 @@ import HelperMethods.PegArgument;
 import HelperMethods.VideoChecks;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -21,6 +22,14 @@ public interface PegGenerator {
     double getStartTime();
     double getEndTime();
     double getFPS();
+
+    /*
+        These methods are used for getting details about the video file
+     */
+    String getLocation();
+    String getName();
+    String getURI();
+    File getFile();
 
     ArrayList<String> getEncoders();
 
@@ -41,6 +50,8 @@ public interface PegGenerator {
     void passMetaData(double source_fps, double source_duration);
 
     void loadClipBounds(double start, double end, double speed, double volume);
+
+    void setClipCrop(int x1, int x2, int y1, int y2);
 
     double getTotalFrames();
 

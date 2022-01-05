@@ -24,8 +24,10 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -58,12 +60,21 @@ public class MainController {
     public Button settingsButton;
     public Slider volumeSlider;
     public Slider speedSlider;
+    public Button cropItButton;
 
     private boolean isPlaying = false;
     private boolean scrubbing = false;
     private float fps = 30;
     private ArrayList<PopOut> popOuts = new ArrayList<>();
     private PegGenerator pegGenerator;
+
+    private String timeFormatter(double time) {
+        int hours = (int) (time / 3600);
+        int minutes = (int) ((time % 3600) / 60);
+        int seconds = (int) (time % 60);
+        int milliseconds = (int) (time % 1 * 100);
+        return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds);
+    }
 
     public void onClose(WindowEvent event) {
         for (PopOut popOut : popOuts) {
@@ -88,7 +99,7 @@ public class MainController {
                 event.acceptTransferModes(TransferMode.LINK);
             } else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
                     (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
-                event.acceptTransferModes(TransferMode.NONE);
+                event.acceptTransferModes(TransferMode.LINK);
             } else event.acceptTransferModes(TransferMode.NONE);
         }
         event.consume();
@@ -120,7 +131,7 @@ public class MainController {
             }else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
                     (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
                 try {
-                    loadFileDirect(new File(event.getDragboard().getString()));
+                    loadDiscord(event.getDragboard().getString());
                 } catch (IOException | InterruptedException | URISyntaxException e) {
                     System.out.println("Discord link dragNdropp failed");
                     e.printStackTrace();
@@ -158,15 +169,9 @@ public class MainController {
             public void handle(long now) {
                 if(!scrubbing) scrubBar.setValue((mediaPlayer.getCurrentTime().toSeconds()
                             / mediaPlayer.getTotalDuration().toSeconds()) * 100);
-                clipStartText.setText(String.format("%.2f/%.2f",
-                        clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds(),
-                        mediaPlayer.getTotalDuration().toSeconds()));
-                scrubBarText.setText(String.format("%.2f/%.2f",
-                        scrubBar.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds(),
-                        mediaPlayer.getTotalDuration().toSeconds()));
-                clipEndText.setText(String.format("%.2f/%.2f",
-                        clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds(),
-                        mediaPlayer.getTotalDuration().toSeconds()));
+                clipStartText.setText(timeFormatter(clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
+                scrubBarText.setText(timeFormatter(scrubBar.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
+                clipEndText.setText(timeFormatter(clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
             }
         };
         timer.start();
@@ -192,6 +197,7 @@ public class MainController {
         scrubBar.setDisable(!enabled);
         ejectButton.setDisable(!enabled);
         volumeSlider.setDisable(!enabled);
+        speedSlider.setDisable(!enabled);
     }
 
     public void ejectMedia(MouseEvent mouseEvent) {
@@ -307,6 +313,13 @@ public class MainController {
         popOuts.add(clippingProgressWindow);
     }
 
+    public void loadDiscord(String link) throws IOException, URISyntaxException, InterruptedException {
+        URL url = new URL(link);
+        String path = url.toURI().getPath();
+        System.out.println(path);
+        loadFileDirect(new File(path));
+    }
+
     public void loadFileDirect(File file) throws IOException, InterruptedException, URISyntaxException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
@@ -316,7 +329,8 @@ public class MainController {
         stage.show();
         ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
-        compat.passObjects(VideoURI, new go(), file);
+        FilePegGenerator pegGenerator = new FilePegGenerator(file);
+        compat.passObjects(VideoURI, new go(), file, pegGenerator);
     }
 
     public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException, URISyntaxException {
@@ -337,7 +351,8 @@ public class MainController {
         stage.show();
         ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
-        compat.passObjects(VideoURI, new go());
+        FilePegGenerator pegGenerator = new FilePegGenerator();
+        compat.passObjects(VideoURI, new go(), pegGenerator);
     }
 
     public void loadYoutube(MouseEvent mouseEvent) throws IOException{
@@ -442,6 +457,17 @@ public class MainController {
         if (mediaPlayer != null) {
             mediaPlayer.setRate(speedSlider.getValue() / 100);
         }
+    }
+
+    public void cropIt(MouseEvent mouseEvent) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("cropping-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Cropping Menu");
+        stage.setScene(scene);
+        stage.show();
+        CroppingView controller = fxmlLoader.getController();
+        controller.passObjects(mediaPlayer, pegGenerator);
     }
 
     class go implements Method {

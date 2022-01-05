@@ -6,6 +6,7 @@ import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
 import Interfaces.Method;
+import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
@@ -53,7 +54,7 @@ public class ImporterView implements PopOut {
     private Process clipper;
     private FileChooser fileChooser;
     private Method finishMethod;
-    private FilePegGenerator pegGenerator;
+    private PegGenerator pegGenerator;
 
     public ImporterView() {
 
@@ -196,7 +197,6 @@ public class ImporterView implements PopOut {
             temp.deleteOnExit(); // Delete the temp file after normal termination of the JVM
             System.out.println("Temp file marked for deletion on exit.");
             isAlive = false;
-            this.pegGenerator.setTempFile(temp.getAbsolutePath());
             ((Stage) pain.getScene().getWindow()).close();
             this.finishMethod.execute(this.pegGenerator);
         } else {
@@ -205,23 +205,13 @@ public class ImporterView implements PopOut {
         }
     }
 
-    public void bypassFileChooser(File file, Method execute) throws IOException, InterruptedException, URISyntaxException {
-        this.finishMethod = execute;
-        this.closeHook(this.pain);
-        pathBox.setDisable(true);
-        nameBox.setDisable(true);
-        typeBox.setDisable(true);
-        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
-        checkHWACCEL();
-        preformImport(file);
-    }
-
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI, Method execute) throws IOException, InterruptedException, URISyntaxException {
-
+    public void passObjects(TextField VideoURI, Method execute, PegGenerator pegGenerator)
+            throws IOException, InterruptedException, URISyntaxException {
         this.VideoURI = VideoURI;
         this.finishMethod = execute;
         this.closeHook(this.pain);
+        this.pegGenerator = pegGenerator;
         pathBox.setDisable(true);
         nameBox.setDisable(true);
         typeBox.setDisable(true);
@@ -239,11 +229,13 @@ public class ImporterView implements PopOut {
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
         java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
         fileChooser = null;
-        preformImport(file);
+        preformImport();
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI, Method execute, File file) throws IOException, InterruptedException, URISyntaxException {
+    public void passObjects(TextField VideoURI, Method execute, File file, PegGenerator pegGenerator)
+            throws IOException, InterruptedException, URISyntaxException {
+        this.pegGenerator = pegGenerator;
         System.out.println("Bypassing file chooser");
         this.VideoURI = VideoURI;
         this.finishMethod = execute;
@@ -254,32 +246,31 @@ public class ImporterView implements PopOut {
         progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
         checkHWACCEL();
         typeBox.setItems(FXCollections.observableArrayList("h264_nvenc", "h264_amf", "libx264"));
-        preformImport(file);
+        preformImport();
     }
 
-    private void preformImport(File file) throws IOException, InterruptedException, URISyntaxException {
-        if (file != null) {
-            this.pegGenerator = new FilePegGenerator(file.toURI().toString());
-            ffmpegOutput.appendText("Loading file: " + file.getAbsolutePath() + "\n");
+    private void preformImport() throws IOException, InterruptedException, URISyntaxException {
+        if (pegGenerator != null) {
+            ffmpegOutput.appendText("Loading file: " + pegGenerator.getLocation() + "\n");
             ffmpegOutput.appendText("Determining encoding type\n");
-            VideoChecks.checkAllowedSizes(file);
-            pathBox.setText(file.getAbsolutePath());
+            VideoChecks.checkAllowedSizes(pegGenerator.getLocation());
+            pathBox.setText(pegGenerator.getLocation());
             nameBox.setText("resources/videoResources/TempWorkingFile.mp4");
             // Check if the file is a supported encoding
-            String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + file.getAbsolutePath() + "\"");
+            String encoding = StreamedCommand.getCommandOutput("ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=codec_name \"" + pegGenerator.getLocation() + "\"");
             ffmpegOutput.appendText("Encoding type: " + encoding + "\n");
             System.out.println("Encoding type: " + encoding);
-            if (encoding.equals("h264") && file.getName().endsWith(".mp4")) {
+            if (encoding.equals("h264") && pegGenerator.getName().endsWith(".mp4")) {
                 // If it is, bypass the file conversion and just set the video URI
                 System.out.println("Encoding type is h264, bypassing conversion.");
-                VideoURI.setText(file.toURI().toString());
+                VideoURI.setText(pegGenerator.getURI());
                 isAlive = false;
                 ((Stage) pain.getScene().getWindow()).close();
                 this.finishMethod.execute(this.pegGenerator);
             } else if (encoding.equals("h264")){
                 System.out.println("Converting container to mp4");
                 String command = "ffmpeg -i \"%s\" -c copy \"%s\"";
-                Process process = StreamedCommand.runCommand(String.format(command, file.getAbsolutePath(),
+                Process process = StreamedCommand.runCommand(String.format(command, pegGenerator.getLocation(),
                         nameBox.getText()));
                 process.waitFor();
                 this.finish();

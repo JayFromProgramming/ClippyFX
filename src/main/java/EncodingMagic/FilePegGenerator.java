@@ -17,19 +17,30 @@ import java.util.ArrayList;
 public class FilePegGenerator implements PegGenerator {
 
     private String filePath;
-    private String tempPath;
+    private File file;
     private double CLIP_SPEED;
     private double CLIP_VOLUME;
     private double sourceFps;
     private int sourceTotalFrames;
     private double START_TIME;
     private double END_TIME;
+    public int cropX1;
+    public int cropX2;
+    public int cropY1;
+    public int cropY2;
 
     public FilePegGenerator(){}
 
+    public FilePegGenerator(File file){
+        this.file = file;
+        this.filePath = file.getAbsolutePath();
+    }
+
     public FilePegGenerator(String uri) throws URISyntaxException {
+        System.out.println("FilePegGenerator: " + uri);
         URI uri_object = new URI(uri);
         this.filePath = String.valueOf(Paths.get(uri_object));
+        this.file = new File(filePath);
     }
 
     @Override
@@ -45,6 +56,26 @@ public class FilePegGenerator implements PegGenerator {
 
     @Override
     public double getFPS() {return sourceFps;}
+
+    @Override
+    public String getLocation() {
+        return file.getAbsolutePath();
+    }
+
+    @Override
+    public String getName() {
+        return file.getName();
+    }
+
+    @Override
+    public String getURI() {
+        return file.toURI().toString();
+    }
+
+    @Override
+    public File getFile() {
+        return file;
+    }
 
     @Override
     public ArrayList<String> getEncoders() {
@@ -66,10 +97,6 @@ public class FilePegGenerator implements PegGenerator {
         }
     }
 
-    public void setTempFile(String path) {
-        tempPath = path;
-    }
-
     @Override
     public void setVideoYT(JSONObject youtubeData) {
         throw new UnsupportedOperationException("This method is not supported by the FilePegGenerator");
@@ -87,6 +114,14 @@ public class FilePegGenerator implements PegGenerator {
         END_TIME = end;
         CLIP_SPEED = speed;
         CLIP_VOLUME = volume;
+    }
+
+    @Override
+    public void setClipCrop(int x1, int x2, int y1, int y2) {
+        cropX1 = x1;
+        cropX2 = x2;
+        cropY1 = y1;
+        cropY2 = y2;
     }
 
     @Override
