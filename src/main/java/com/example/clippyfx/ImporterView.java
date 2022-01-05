@@ -1,6 +1,5 @@
 package com.example.clippyfx;
 
-import EncodingMagic.FilePegGenerator;
 import HelperMethods.VideoChecks;
 import HelperMethods.FFmpegWrapper;
 import HelperMethods.SettingsWrapper;
@@ -233,7 +232,7 @@ public class ImporterView implements PopOut {
     }
 
     @SuppressWarnings("unchecked")
-    public void passObjects(TextField VideoURI, Method execute, File file, PegGenerator pegGenerator)
+    public void directLoad(TextField VideoURI, Method execute, PegGenerator pegGenerator)
             throws IOException, InterruptedException, URISyntaxException {
         this.pegGenerator = pegGenerator;
         System.out.println("Bypassing file chooser");

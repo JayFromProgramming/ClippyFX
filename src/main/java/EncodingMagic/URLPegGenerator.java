@@ -33,9 +33,7 @@ public class URLPegGenerator implements PegGenerator {
     public URLPegGenerator(){}
 
     public URLPegGenerator(String url) throws URISyntaxException {
-        System.out.println("FilePegGenerator: " + uri);
-        URI uri_object = new URI(uri);
-        this.fileLink = String.valueOf(Paths.get(uri_object));
+        this.fileLink = url;
     }
 
     @Override

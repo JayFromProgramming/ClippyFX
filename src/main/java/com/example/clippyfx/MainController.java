@@ -1,11 +1,11 @@
 package com.example.clippyfx;
 
 import EncodingMagic.FilePegGenerator;
+import EncodingMagic.URLPegGenerator;
 import HelperMethods.StreamedCommand;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
-import eu.hansolo.tilesfx.Command;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -24,10 +24,8 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -97,8 +95,8 @@ public class MainController {
             if (event.getDragboard().getString().contains("youtube.com/watch?v=")
                     || event.getDragboard().getString().contains("youtu.be/")) {
                 event.acceptTransferModes(TransferMode.LINK);
-            } else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
-                    (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
+            } else if (event.getDragboard().getString().contains("http://") ||
+                    event.getDragboard().getString().contains("https://")) {
                 event.acceptTransferModes(TransferMode.LINK);
             } else event.acceptTransferModes(TransferMode.NONE);
         }
@@ -128,10 +126,10 @@ public class MainController {
                     System.out.println("Youtube link dragNdrop failed");
                     e.printStackTrace();
                 }
-            }else if (event.getDragboard().getString().contains("cdn.discordapp.com/attachments/") &&
-                    (event.getDragboard().getString().contains(".mp4") || event.getDragboard().getString().contains(".webm"))) {
+            }else if (event.getDragboard().getString().contains("http://") ||
+                    event.getDragboard().getString().contains("https://")) {
                 try {
-                    loadDiscord(event.getDragboard().getString());
+                    loadURLFile(event.getDragboard().getString());
                 } catch (IOException | InterruptedException | URISyntaxException e) {
                     System.out.println("Discord link dragNdropp failed");
                     e.printStackTrace();
@@ -142,8 +140,8 @@ public class MainController {
     }
 
     @FXML
-    protected void onMediaLoad(MouseEvent ignored) throws IOException, URISyntaxException {
-        loadMedia(new FilePegGenerator());
+    protected void onMediaLoad(MouseEvent ignored) throws IOException, URISyntaxException, InterruptedException {
+        loadURLFile(VideoURI.getText());
     }
 
     protected void loadMedia(PegGenerator pegGenerator) throws IOException, URISyntaxException {
@@ -198,6 +196,7 @@ public class MainController {
         ejectButton.setDisable(!enabled);
         volumeSlider.setDisable(!enabled);
         speedSlider.setDisable(!enabled);
+        cropItButton.setDisable(!enabled);
     }
 
     public void ejectMedia(MouseEvent mouseEvent) {
@@ -208,6 +207,8 @@ public class MainController {
         VideoPain.getChildren().remove(1);
         setEnabledUI(false);
         LoadPane.setVisible(true);
+        VideoURI.clear();
+
     }
 
     protected double calcFrameRate(String ffprobeOutput) {
@@ -313,11 +314,17 @@ public class MainController {
         popOuts.add(clippingProgressWindow);
     }
 
-    public void loadDiscord(String link) throws IOException, URISyntaxException, InterruptedException {
-        URL url = new URL(link);
-        String path = url.toURI().getPath();
-        System.out.println(path);
-        loadFileDirect(new File(path));
+    public void loadURLFile(String link) throws IOException, URISyntaxException, InterruptedException {
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Stage stage = new Stage();
+        stage.setTitle("ClippyFX: Advanced video loader");
+        stage.setScene(scene);
+        stage.show();
+        ImporterView compat = fxmlLoader.getController();
+        popOuts.add(compat);
+        URLPegGenerator pegGenerator = new URLPegGenerator(link);
+        compat.directLoad(VideoURI, new go(), pegGenerator);
     }
 
     public void loadFileDirect(File file) throws IOException, InterruptedException, URISyntaxException {
@@ -330,7 +337,7 @@ public class MainController {
         ImporterView compat = fxmlLoader.getController();
         popOuts.add(compat);
         FilePegGenerator pegGenerator = new FilePegGenerator(file);
-        compat.passObjects(VideoURI, new go(), file, pegGenerator);
+        compat.directLoad(VideoURI, new go(), pegGenerator);
     }
 
     public void loadFile(MouseEvent mouseEvent) throws IOException, InterruptedException, URISyntaxException {

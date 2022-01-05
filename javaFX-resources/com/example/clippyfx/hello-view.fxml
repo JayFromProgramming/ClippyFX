@@ -22,8 +22,8 @@
             <children>
                <AnchorPane fx:id="LoadPane" layoutX="294.0" layoutY="198.0" prefHeight="126.0" prefWidth="267.0">
                   <children>
-                     <TextField fx:id="VideoURI" disable="true" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
-                     <Button fx:id="goButton" disable="true" layoutX="217.0" layoutY="85.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" prefHeight="26.0" prefWidth="41.0" text="Go!" />
+                     <TextField fx:id="VideoURI" layoutX="10.0" layoutY="85.0" prefHeight="26.0" prefWidth="203.0" />
+                     <Button fx:id="goButton" layoutX="217.0" layoutY="85.0" mnemonicParsing="false" onMousePressed="#onMediaLoad" prefHeight="26.0" prefWidth="41.0" text="Go!" />
                      <Button fx:id="vp9LoadButton" layoutX="10.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#loadFile" prefWidth="124.0" text="Advanced File Load" />
                    <Button fx:id="LoadFileButton" layoutX="150.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#openHelp" prefWidth="108.0" text="Help Menu" />
                      <Button fx:id="youtubeButton" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#loadYoutube" text="Youtube Video Load" />
