@@ -2,12 +2,15 @@ package EncodingMagic;
 
 import HelperMethods.PegArgument;
 import HelperMethods.SettingsWrapper;
+import HelperMethods.StreamedCommand;
 import HelperMethods.VideoChecks;
 import Interfaces.PegGenerator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -135,7 +138,7 @@ public class FilePegGenerator implements PegGenerator {
     }
 
     @Override
-    public String buildPeg(String savePath, PegArgument args){
+    public String buildPeg(String savePath, PegArgument args) throws IOException {
         System.out.println("Building Peg");
         StringBuilder command = new StringBuilder();
         command.append(String.format("ffmpeg -y -ss %.2f -i \"%s\" -to %.2f ", START_TIME, filePath,
