@@ -38,7 +38,7 @@ public class URLPegGenerator implements PegGenerator {
 
     @Override
     public void setFile(File file) {
-
+        throw new UnsupportedOperationException("This method is not supported by the URLPegGenerator");
     }
 
     @Override

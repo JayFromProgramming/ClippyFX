@@ -54,6 +54,7 @@ public class ImporterView implements PopOut {
     private FileChooser fileChooser;
     private Method finishMethod;
     private PegGenerator pegGenerator;
+    private progressUpdater updater;
 
     public ImporterView() {
 
@@ -160,6 +161,8 @@ public class ImporterView implements PopOut {
         if (clipping){
             FFmpegWrapper.killProcess(clipper);
             clipping=false;
+            updater.stop();
+            this.close();
             return;
         }
         swapVisibility();
@@ -179,7 +182,8 @@ public class ImporterView implements PopOut {
         ffmpegOutput.appendText("Conversion command: " + command + "\n");
         clipper = StreamedCommand.runCommand(command);
         ffmpegOutput.appendText("Command loaded, starting conversion.\n");
-        new progressUpdater(clipper).start();
+        updater = new progressUpdater(clipper);
+        updater.start();
         clipping = true;
         clipItButton.setText("Abort");
     }
@@ -225,10 +229,17 @@ public class ImporterView implements PopOut {
                 "*.webm", "*.mkv", "*.mov"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Basic Formats",
                 "*.mp4", "*.avi", "*.mov"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
-        pegGenerator.setFile(fileChooser.showOpenDialog(pain.getScene().getWindow()));
-        fileChooser = null;
-        preformImport();
+        File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
+        if (file != null) {
+            pegGenerator.setFile(file);
+            fileChooser = null;
+            preformImport();
+        }else {
+            fileChooser = null;
+            this.close();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -303,6 +314,7 @@ public class ImporterView implements PopOut {
             return false;
         }
         ((Stage) pain.getScene().getWindow()).close();
+        isAlive = false;
         return true;
     }
 
@@ -315,11 +327,12 @@ public class ImporterView implements PopOut {
         if (clipper != null && clipper.isAlive()) {
             try{FFmpegWrapper.killProcess(clipper);}catch (Exception ignored){}
             event.consume();
+            System.out.println("Clipper is still alive, cannot close converter.");
         }
         if (fileChooser != null) {
             event.consume();
+            System.out.println("File chooser is open, cancelling close");
         }
-        System.out.println("Window closed.");
         this.isAlive = false;
     }
 

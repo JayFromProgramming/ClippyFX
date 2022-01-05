@@ -48,6 +48,7 @@ public class FilePegGenerator implements PegGenerator {
 
     public void setFile(File file) {
         this.file = file;
+        this.filePath = file.getAbsolutePath();
     }
 
     @Override
