@@ -46,6 +46,10 @@ public class FilePegGenerator implements PegGenerator {
         this.file = new File(filePath);
     }
 
+    public void setFile(File file) {
+        this.file = file;
+    }
+
     @Override
     public PegType getType() {
         return PegType.File;

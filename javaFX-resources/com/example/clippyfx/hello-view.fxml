@@ -55,7 +55,7 @@
          <Slider fx:id="speedSlider" disable="true" layoutX="7.0" layoutY="560.0" max="200.0" min="50.0" onMouseReleased="#speedSlid" orientation="VERTICAL" prefHeight="72.0" prefWidth="14.0" value="100.0" />
          <Text layoutX="10.0" layoutY="598.0" rotate="-90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Volume" />
          <Text layoutX="-17.0" layoutY="601.0" rotate="-90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Speed" />
-         <Button fx:id="cropItButton" layoutX="802.0" layoutY="583.0" mnemonicParsing="false" onMouseClicked="#cropIt" text="Crop it!" />
+         <Button fx:id="cropItButton" disable="true" layoutX="802.0" layoutY="583.0" mnemonicParsing="false" onMouseClicked="#cropIt" text="Crop it!" />
       </children>
    </AnchorPane>
 </VBox>

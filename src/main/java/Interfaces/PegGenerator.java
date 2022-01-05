@@ -16,7 +16,7 @@ public interface PegGenerator {
         URI,
         UnDeclared
     }
-
+    void setFile(File file);
     PegType getType();
 
     double getStartTime();

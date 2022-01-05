@@ -37,6 +37,11 @@ public class YoutubePegGenerator implements PegGenerator {
 
 
     @Override
+    public void setFile(File file) {
+
+    }
+
+    @Override
     public PegType getType() {
         return PegType.Youtube;
     }

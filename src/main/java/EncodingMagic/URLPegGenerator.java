@@ -37,6 +37,11 @@ public class URLPegGenerator implements PegGenerator {
     }
 
     @Override
+    public void setFile(File file) {
+
+    }
+
+    @Override
     public PegType getType() {
         return PegType.URI;
     }

@@ -226,7 +226,7 @@ public class ImporterView implements PopOut {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Basic Formats",
                 "*.mp4", "*.avi", "*.mov"));
         fileChooser.setInitialDirectory(new File(SettingsWrapper.getSetting("defaultAdvancedLoadPath").value));
-        java.io.File file = fileChooser.showOpenDialog(pain.getScene().getWindow());
+        pegGenerator.setFile(fileChooser.showOpenDialog(pain.getScene().getWindow()));
         fileChooser = null;
         preformImport();
     }
