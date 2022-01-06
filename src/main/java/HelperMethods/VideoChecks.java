@@ -65,6 +65,7 @@ public class VideoChecks {
     };
 
     public static Sizes getSize(){
+        if (AVAILABLE_SIZES.size() <= 1) return Sizes.x144p;
         return AVAILABLE_SIZES.get(1);
     }
 
