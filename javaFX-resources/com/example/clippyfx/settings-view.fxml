@@ -4,9 +4,11 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane fx:id="pain" onKeyPressed="#keyPressed" onScroll="#mouseScroll" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.SettingsView">
    <children>
+      <Text fx:id="noticeText" layoutX="322.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="*Keyboard shortcuts are disabled in this tab" visible="false" />
       <TabPane fx:id="settingsTabs" layoutX="14.0" layoutY="14.0" onMouseClicked="#changeTab" prefHeight="342.0" prefWidth="570.0" tabClosingPolicy="UNAVAILABLE" />
       <ButtonBar layoutX="300.0" layoutY="360.0" prefHeight="40.0" prefWidth="200.0">
         <buttons>

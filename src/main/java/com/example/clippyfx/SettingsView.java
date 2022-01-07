@@ -31,16 +31,19 @@ public class SettingsView implements PopOut {
     public AnchorPane pain;
     public TabPane settingsTabs;
     public Tab focusedTab;
+    public Text noticeText;
 
     private boolean isAlive = true;
     private final ArrayList<OptionWrapper> options = new ArrayList<>();
     private final Map<String, tabWrapper> tabs = new java.util.HashMap<>();
 
     public void keyPressed(KeyEvent keyEvent) {
-        switch (keyEvent.getCode()) {
-            case ESCAPE -> close();
-            case ENTER -> onSavePressed(null);
-            case F5 -> build();
+        if (!settingsTabs.getSelectionModel().getSelectedItem().getText().equals("Keybinds")) {
+            switch (keyEvent.getCode()) {
+                case ESCAPE -> close();
+                case ENTER -> onSavePressed(null);
+                case F5 -> build();
+            }
         }
     }
 
@@ -54,6 +57,7 @@ public class SettingsView implements PopOut {
     }
 
     public void changeTab(MouseEvent mouseEvent) {
+        noticeText.setVisible(settingsTabs.getSelectionModel().getSelectedItem().getText().equals("Keybinds"));
     }
 
 
@@ -116,19 +120,29 @@ public class SettingsView implements PopOut {
                 Button button = new Button("Choose");
                 button.setOnMouseClicked(mouseEvent -> makeDirectorySelector(textField, setting.value));
                 textField.setText(setting.value);
-                textField.setLayoutY(yOffset + 5);
+                textField.setLayoutY(yOffset + 6);
                 textField.setPrefWidth(350);
                 button.setLayoutX(textField.getLayoutX() + textField.getPrefWidth() + 5);
-                button.setLayoutY(yOffset + 5);
+                button.setLayoutY(yOffset + 6);
                 textField.setDisable(false);
                 option.textField = textField;
                 option.type = "textField";
                 parent.getChildren().addAll(fieldName, textField, button);
             }
+            case "keyBind" -> {
+                TextField textField = new TextField();
+                textField.setText(setting.value);
+                textField.setLayoutY(yOffset + 6);
+                textField.setPrefWidth(175);
+                textField.setOnKeyReleased(keyEvent -> keyPressDetector(textField, keyEvent));
+                option.textField = textField;
+                option.type = "keyBind";
+                parent.getChildren().addAll(fieldName, textField);
+            }
             case "toggle" -> {
                 CheckBox checkBox = new CheckBox();
                 checkBox.setSelected(setting.bool());
-                checkBox.setLayoutY(yOffset + 5);
+                checkBox.setLayoutY(yOffset + 6);
                 parent.getChildren().addAll(fieldName, checkBox);
                 option.checkBox = checkBox;
                 option.type = "checkBox";
@@ -137,7 +151,7 @@ public class SettingsView implements PopOut {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
                 choiceBox.getItems().addAll(VideoChecks.getSizesString());
                 choiceBox.setValue(setting.value);
-                choiceBox.setLayoutY(yOffset + 5);
+                choiceBox.setLayoutY(yOffset + 6);
                 parent.getChildren().addAll(fieldName, choiceBox);
                 option.choiceBox = choiceBox;
                 option.type = "choiceBox";
@@ -146,7 +160,7 @@ public class SettingsView implements PopOut {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
                 choiceBox.getItems().addAll(VideoChecks.getEncodersString());
                 choiceBox.setValue(setting.value);
-                choiceBox.setLayoutY(yOffset + 5);
+                choiceBox.setLayoutY(yOffset + 6);
                 parent.getChildren().addAll(fieldName, choiceBox);
                 option.choiceBox = choiceBox;
                 option.type = "choiceBox";
@@ -171,6 +185,12 @@ public class SettingsView implements PopOut {
         if (selectedDirectory != null) {
             textField.setText(selectedDirectory.getAbsolutePath());
         }
+    }
+
+    private void keyPressDetector(TextField textField, KeyEvent keyEvent) {
+        textField.clear();
+        textField.setText(keyEvent.getCode().getName());
+        keyEvent.consume();
     }
 
     public void onSavePressed(MouseEvent mouseEvent) {

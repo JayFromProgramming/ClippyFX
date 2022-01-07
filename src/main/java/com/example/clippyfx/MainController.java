@@ -2,6 +2,7 @@ package com.example.clippyfx;
 
 import EncodingMagic.FilePegGenerator;
 import EncodingMagic.URLPegGenerator;
+import HelperMethods.SettingsWrapper;
 import HelperMethods.StreamedCommand;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
@@ -256,29 +257,34 @@ public class MainController {
     }
 
     public void keyPressed(KeyEvent keyEvent) throws IOException, InterruptedException {
-        switch (keyEvent.getCode()) {
-            case LEFT -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1))).start();
-            case RIGHT -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1))).start();
-            case COMMA -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
-            case PERIOD -> new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
-            case SPACE -> {
-                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    mediaPlayer.pause();
-                    playPauseButton.setText("Play");
-                } else {
-                    mediaPlayer.play();
-                    playPauseButton.setText("Pause");
-                }
-            }
-            case ENTER -> clipIt();
-            case SEMICOLON -> clipStart.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
-            case QUOTE -> clipEnd.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
-            case P ->{
-                new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()
-                        * (clipStart.getValue() / 100)))).start();
+
+        if (keyEvent.getCode() == SettingsWrapper.keyBind("skipBackward"))
+            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1))).start();
+        if (keyEvent.getCode() == SettingsWrapper.keyBind("skipForward"))
+            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1))).start();
+        if (keyEvent.getCode() == SettingsWrapper.keyBind("previousFrame"))
+            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() - 1 / fps))).start();
+        if (keyEvent.getCode() == SettingsWrapper.keyBind("nextFrame"))
+            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getCurrentTime().toSeconds() + 1 / fps))).start();
+        if (keyEvent.getCode() == SettingsWrapper.keyBind("playPauseKey")) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+                playPauseButton.setText("Play");
+            } else {
                 mediaPlayer.play();
                 playPauseButton.setText("Pause");
             }
+        }
+        if (keyEvent.getCode() == KeyCode.ENTER) clipIt();
+        if (keyEvent.getCode() == KeyCode.SEMICOLON)
+            clipStart.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
+        if (keyEvent.getCode() == KeyCode.QUOTE)
+            clipEnd.setValue(mediaPlayer.getCurrentTime().toSeconds() / mediaPlayer.getTotalDuration().toSeconds() * 100);
+        if (keyEvent.getCode() == KeyCode.P){
+            new Thread(() -> mediaPlayer.seek(Duration.seconds(mediaPlayer.getTotalDuration().toSeconds()
+                    * (clipStart.getValue() / 100)))).start();
+            mediaPlayer.play();
+            playPauseButton.setText("Pause");
         }
     }
 

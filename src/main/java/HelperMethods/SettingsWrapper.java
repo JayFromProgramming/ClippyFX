@@ -1,5 +1,7 @@
 package HelperMethods;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,6 +115,15 @@ public class SettingsWrapper {
             return new setting(settingsJSON.getJSONObject(key));
         } catch (JSONException e) {
             return repairSetting(key);
+        }
+    }
+
+    public static KeyCode keyBind(String key){
+        try {
+            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value"));
+        } catch (JSONException e) {
+            repairSetting(key);
+            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value"));
         }
     }
 }

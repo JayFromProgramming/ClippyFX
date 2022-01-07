@@ -70,10 +70,38 @@
     "group": "Playback"
   },
   "playPauseKey": {
-    "name": "playPauseKey",
+    "name": "Play/Pause Key",
     "type": "keyBind",
     "value": "Space",
     "description": "The key to use to play/pause.",
+    "group": "Keybinds"
+  },
+  "nextFrame": {
+    "name": "Next Frame",
+    "type": "keyBind",
+    "value": "Period",
+    "description": "The key to use to go to the next frame.",
+    "group": "Keybinds"
+  },
+  "previousFrame": {
+    "name": "Previous Frame",
+    "type": "keyBind",
+    "value": "Comma",
+    "description": "The key to use to go to the previous frame.",
+    "group": "Keybinds"
+  },
+  "skipForward": {
+    "name": "Skip Forward",
+    "type": "keyBind",
+    "value": "Right",
+    "description": "The key to use to skip forward one second.",
+    "group": "Keybinds"
+  },
+  "skipBackward": {
+    "name": "Skip Backward",
+    "type": "keyBind",
+    "value": "Left",
+    "description": "The key to use to skip backward one second.",
     "group": "Keybinds"
   }
 }
