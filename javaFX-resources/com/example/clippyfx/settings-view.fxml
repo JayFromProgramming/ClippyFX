@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="pain" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.SettingsView">
+<AnchorPane fx:id="pain" onKeyPressed="#keyPressed" onScroll="#mouseScroll" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.clippyfx.SettingsView">
    <children>
-      <ButtonBar layoutX="301.0" layoutY="350.0" prefHeight="40.0" prefWidth="200.0">
+      <TabPane fx:id="settingsTabs" layoutX="14.0" layoutY="14.0" onMouseClicked="#changeTab" prefHeight="342.0" prefWidth="570.0" tabClosingPolicy="UNAVAILABLE" />
+      <ButtonBar layoutX="300.0" layoutY="360.0" prefHeight="40.0" prefWidth="200.0">
         <buttons>
-          <Button fx:id="saveButton" mnemonicParsing="false" onMouseClicked="#onSavePressed" text="Save" />
-            <Button fx:id="resetButton" mnemonicParsing="false" onMouseClicked="#onResetPressed" text="Reset" />
-            <Button fx:id="cancelButton" mnemonicParsing="false" onMouseClicked="#onCancelPressed" text="Cancel" />
+          <Button fx:id="saveButton" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#onSavePressed" text="Save" />
+            <Button fx:id="resetButton" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#onResetPressed" text="Reset" />
+            <Button fx:id="cancelButton" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#onCancelPressed" text="Cancel" />
         </buttons>
       </ButtonBar>
-      <Accordion layoutX="14.0" layoutY="14.0" />
-      <Accordion fx:id="accordion" layoutX="14.0" layoutY="14.0" prefWidth="574.0" />
    </children>
 </AnchorPane>

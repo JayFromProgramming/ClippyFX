@@ -51,6 +51,20 @@ public class StreamedCommand {
         return process.exitValue();
     }
 
+    public static String returnErrorString(Process process, int timeout) throws IOException {
+        if (waitForExit(process, timeout) != 0) {
+            StringBuilder output = new StringBuilder();
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line);
+                }
+            }
+            return output.toString();
+        }
+        return "";
+    }
+
     public static int throwForExit(Process process, int timeout) throws IOException, TimeoutException {
         long start = System.currentTimeMillis();
         long end = start + timeout * 1000L;

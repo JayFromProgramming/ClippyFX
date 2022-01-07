@@ -3,10 +3,14 @@ package com.example.clippyfx;
 import HelperMethods.VideoChecks;
 import HelperMethods.SettingsWrapper;
 import Interfaces.PopOut;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -16,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 public class SettingsView implements PopOut {
@@ -24,10 +29,33 @@ public class SettingsView implements PopOut {
     public Button resetButton;
     public Button cancelButton;
     public AnchorPane pain;
-    public Accordion accordion;
+    public TabPane settingsTabs;
+    public Tab focusedTab;
 
     private boolean isAlive = true;
     private final ArrayList<OptionWrapper> options = new ArrayList<>();
+    private final Map<String, tabWrapper> tabs = new java.util.HashMap<>();
+
+    public void keyPressed(KeyEvent keyEvent) {
+        switch (keyEvent.getCode()) {
+            case ESCAPE -> close();
+            case ENTER -> onSavePressed(null);
+            case F5 -> build();
+        }
+    }
+
+    public void mouseScroll(ScrollEvent scrollEvent) {
+//        for (Node node : focusedTab.gry.getChildren()) {
+//            node.setTranslateY(node.getTranslateY() + scrollEvent.getDeltaY());
+//            // Get if the node is out of bounds and if so, make it hidden
+//            node.setVisible(!(node.getLayoutY() + node.getTranslateY() > 320));
+//        }
+        scrollEvent.consume();
+    }
+
+    public void changeTab(MouseEvent mouseEvent) {
+    }
+
 
     static class OptionWrapper {
         String name;
@@ -38,6 +66,13 @@ public class SettingsView implements PopOut {
         ChoiceBox choiceBox;
     }
 
+    static class tabWrapper {
+        String name;
+        Pane pane;
+        Tab tab;
+        int yOffset = 0;
+    }
+
     public void hookHooks(){
         closeHook(this.pain);
     }
@@ -45,21 +80,27 @@ public class SettingsView implements PopOut {
     public void build() {
         System.out.println("Initializing SettingsView");
         ArrayList<SettingsWrapper.setting> settings = SettingsWrapper.getAllSettings();
-        Pane pane = new Pane();
-
-        int yOffset = 12;
-        int page = 1;
         for (SettingsWrapper.setting setting : settings) {
-            if (yOffset > 230) {
-                accordion.getPanes().add(new TitledPane("Page: " + page, pane));
-                yOffset = 12;
-                page += 1;
-                pane = new Pane();
+            if (tabs.containsKey(setting.group)) {
+                tabs.get(setting.group).yOffset += 44;
+                Pane tab = tabs.get(setting.group).pane;
+                int yOffset = tabs.get(setting.group).yOffset;
+                settingOptionBuilder(setting, yOffset, tab);
+            } else {
+                tabWrapper tabWrapper = new tabWrapper();
+                tabWrapper.name = setting.group;
+                tabWrapper.pane = new Pane();
+                tabWrapper.tab = new Tab(setting.group);
+                tabWrapper.tab.setContent(tabWrapper.pane);
+                tabWrapper.yOffset = 24;
+                tabs.put(setting.group, tabWrapper);
+                settingOptionBuilder(setting, tabWrapper.yOffset, tabWrapper.pane);
             }
-            settingOptionBuilder(setting, yOffset, pane);
-            yOffset += 50;
+
         }
-        accordion.getPanes().add(new TitledPane("Page: " + page, pane));
+        for (Map.Entry<String, tabWrapper> entry : tabs.entrySet()) {
+            settingsTabs.getTabs().add(entry.getValue().tab);
+        }
     }
 
     public void settingOptionBuilder(SettingsWrapper.setting setting, int yOffset, Pane parent) {
@@ -110,6 +151,15 @@ public class SettingsView implements PopOut {
                 option.choiceBox = choiceBox;
                 option.type = "choiceBox";
             }
+            case "text" -> {
+                TextField textField = new TextField();
+                textField.setText(setting.value);
+                textField.setLayoutY(yOffset + 5);
+                textField.setPrefWidth(350);
+                option.textField = textField;
+                option.type = "text";
+                parent.getChildren().addAll(fieldName, textField);
+            }
         }
         options.add(option);
     }
@@ -143,11 +193,8 @@ public class SettingsView implements PopOut {
             }
         }
         SettingsWrapper.saveSettings();
-        int currentPane = accordion.getPanes().indexOf(accordion.getExpandedPane());
-        accordion.getPanes().clear();
         options.clear();
         build();
-        accordion.setExpandedPane(accordion.getPanes().get(currentPane));
     }
 
     public void onResetPressed(MouseEvent mouseEvent) throws IOException {
@@ -159,7 +206,6 @@ public class SettingsView implements PopOut {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             alert.close();
             SettingsWrapper.resetSettings();
-            accordion.getPanes().clear();
             options.clear();
             build();
         } else {
@@ -171,7 +217,7 @@ public class SettingsView implements PopOut {
         boolean changed = false;
         for (OptionWrapper option : options) {
             switch (option.type) {
-                case "textField" -> {if (!option.textField.getText().equals(option.startValue)) changed = true;}
+                case "textField", "text" -> {if (!option.textField.getText().equals(option.startValue)) changed = true;}
                 case "checkBox" -> {
                     String value = option.checkBox.isSelected() ? "true" : "false";
                     if (!value.equals(option.startValue)) changed = true;

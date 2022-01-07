@@ -1,44 +1,79 @@
 {
   "defaultAdvancedLoadPath": {
-    "name": "defaultAdvancedLoadPath",
+    "name": "Default file load path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to load files from."
+    "description": "The default path to load files from.",
+    "group": "Save and Load"
   },
   "defaultAdvancedSavePath": {
-    "name": "defaultAdvancedSavePath",
+    "name": "Default file save path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to save files to."
+    "description": "The default path to save files to.",
+    "group": "Save and Load"
+  },
+  "defaultURLSavePath": {
+    "name": "Default URL save path",
+    "type": "filePath",
+    "value": "C:\\Users\\Public\\Videos",
+    "description": "The default path to save URLs to.",
+    "group": "Save and Load"
   },
   "defaultYoutubeSavePath": {
-    "name": "defaultYoutubeSavePath",
+    "name": "Default YouTube save path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to save youtube clips to."
-  },
-  "defaultAllow100MB": {
-    "name": "defaultAllow100MB",
-    "type": "toggle",
-    "value": "false",
-    "description": "Whether or not to allow 100MB files instead of the default 8MB."
-  },
-  "preferredVideoSize": {
-    "name": "preferredVideoSize",
-    "type": "sizeEnum",
-    "value": "Source",
-    "description": "The preferred video size to select."
+    "description": "The default path to save youtube clips to.",
+    "group": "Save and Load"
   },
   "preferredOutputEncoder": {
     "name": "preferredOutputEncoder",
     "type": "encoderEnum",
     "value": "libvpx_vp9",
-    "description": "The preferred encoder to select for output."
+    "description": "The preferred encoder to select for output.",
+    "group": "Encoding"
   },
   "preferredCompatibilityEncoder":  {
     "name": "preferredCompatibilityEncoder",
     "type": "encoderEnum",
     "value": "libx264",
-    "description": "The preferred encoder to select for when converting to a compatible format."
+    "description": "The preferred encoder to select for when converting to a compatible format.",
+    "group": "Encoding"
+  },
+  "defaultAllow100MB": {
+    "name": "Allow 100MB",
+    "type": "toggle",
+    "value": "false",
+    "description": "Whether or not to allow 100MB files instead of the default 8MB.",
+    "group": "Encoding"
+  },
+  "defaultUseFullCPU": {
+    "name": "Use Full CPU",
+    "type": "toggle",
+    "value": "true",
+    "description": "Whether or not to use full CPU in vp9 encoding.",
+    "group": "Encoding"
+  },
+  "preferredVideoSize": {
+    "name": "preferredVideoSize",
+    "type": "sizeEnum",
+    "value": "Source",
+    "description": "The preferred video size to select.",
+    "group": "Encoding"
+  },
+  "defaultAudioVolume": {
+    "name": "defaultAudioVolume",
+    "type": "text",
+    "value": "1",
+    "description": "The default audio volume to use.",
+    "group": "Playback"
+  },
+  "playPauseKey": {
+    "name": "playPauseKey",
+    "type": "keyBind",
+    "value": "Space",
+    "description": "The key to use to play/pause.",
+    "group": "Keybinds"
   }
 }

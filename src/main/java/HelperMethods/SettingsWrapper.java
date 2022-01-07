@@ -22,6 +22,7 @@ public class SettingsWrapper {
         public String value;
         public String type;
         public String description;
+        public String group;
 
         setting(JSONObject jsonObject){
             try {
@@ -29,6 +30,7 @@ public class SettingsWrapper {
                 this.value = jsonObject.getString("value");
                 this.type = jsonObject.getString("type");
                 this.description = jsonObject.getString("description");
+                this.group = jsonObject.getString("group");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
