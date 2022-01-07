@@ -30,7 +30,7 @@ public class SettingsView implements PopOut {
     public Button cancelButton;
     public AnchorPane pain;
     public TabPane settingsTabs;
-    public Tab focusedTab;
+    public tabWrapper focusedTab;
     public Text noticeText;
 
     private boolean isAlive = true;
@@ -48,20 +48,25 @@ public class SettingsView implements PopOut {
     }
 
     public void mouseScroll(ScrollEvent scrollEvent) {
-//        for (Node node : focusedTab.gry.getChildren()) {
-//            node.setTranslateY(node.getTranslateY() + scrollEvent.getDeltaY());
-//            // Get if the node is out of bounds and if so, make it hidden
-//            node.setVisible(!(node.getLayoutY() + node.getTranslateY() > 320));
-//        }
+        if (focusedTab == null) {
+            focusedTab = tabs.get(settingsTabs.getSelectionModel().getSelectedItem().getText());
+        }
+        for (Node node : focusedTab.pane.getChildren()) {
+            node.setTranslateY(node.getTranslateY() + scrollEvent.getDeltaY());
+            // Get if the node is out of bounds and if so, make it hidden
+            node.setVisible(!(node.getLayoutY() + node.getTranslateY() > 280));
+        }
         scrollEvent.consume();
     }
 
     public void changeTab(MouseEvent mouseEvent) {
+        focusedTab = tabs.get(settingsTabs.getSelectionModel().getSelectedItem().getText());
         noticeText.setVisible(settingsTabs.getSelectionModel().getSelectedItem().getText().equals("Keybinds"));
     }
 
 
     static class OptionWrapper {
+        String key;
         String name;
         String startValue;
         String type;
@@ -84,12 +89,14 @@ public class SettingsView implements PopOut {
     public void build() {
         System.out.println("Initializing SettingsView");
         ArrayList<SettingsWrapper.setting> settings = SettingsWrapper.getAllSettings();
+        settingsTabs.getTabs().clear();
+        tabs.clear();
         for (SettingsWrapper.setting setting : settings) {
             if (tabs.containsKey(setting.group)) {
-                tabs.get(setting.group).yOffset += 44;
+//                tabs.get(setting.group).yOffset += 44;
                 Pane tab = tabs.get(setting.group).pane;
                 int yOffset = tabs.get(setting.group).yOffset;
-                settingOptionBuilder(setting, yOffset, tab);
+                tabs.get(setting.group).yOffset = settingOptionBuilder(setting, yOffset, tab);
             } else {
                 tabWrapper tabWrapper = new tabWrapper();
                 tabWrapper.name = setting.group;
@@ -98,7 +105,7 @@ public class SettingsView implements PopOut {
                 tabWrapper.tab.setContent(tabWrapper.pane);
                 tabWrapper.yOffset = 24;
                 tabs.put(setting.group, tabWrapper);
-                settingOptionBuilder(setting, tabWrapper.yOffset, tabWrapper.pane);
+                tabWrapper.yOffset = settingOptionBuilder(setting, tabWrapper.yOffset, tabWrapper.pane);
             }
 
         }
@@ -107,23 +114,26 @@ public class SettingsView implements PopOut {
         }
     }
 
-    public void settingOptionBuilder(SettingsWrapper.setting setting, int yOffset, Pane parent) {
+    public int settingOptionBuilder(SettingsWrapper.setting setting, int yOffset, Pane parent) {
         Text fieldName = new Text(setting.name);
         fieldName.setText(setting.name + ": " + setting.description);
         fieldName.setLayoutY(yOffset);
         OptionWrapper option = new OptionWrapper();
+        option.key = setting.key;
         option.name = setting.name;
         option.startValue = setting.value;
+        yOffset += fieldName.getLayoutBounds().getHeight() - 10;
         switch (setting.type) {
             case "filePath" -> {
                 TextField textField = new TextField();
                 Button button = new Button("Choose");
                 button.setOnMouseClicked(mouseEvent -> makeDirectorySelector(textField, setting.value));
                 textField.setText(setting.value);
-                textField.setLayoutY(yOffset + 6);
+                textField.setLayoutY(yOffset);
                 textField.setPrefWidth(350);
+                button.setLayoutY(yOffset);
                 button.setLayoutX(textField.getLayoutX() + textField.getPrefWidth() + 5);
-                button.setLayoutY(yOffset + 6);
+                yOffset += textField.getLayoutBounds().getHeight() + 6;
                 textField.setDisable(false);
                 option.textField = textField;
                 option.type = "textField";
@@ -132,9 +142,10 @@ public class SettingsView implements PopOut {
             case "keyBind" -> {
                 TextField textField = new TextField();
                 textField.setText(setting.value);
-                textField.setLayoutY(yOffset + 6);
+                textField.setLayoutY(yOffset);
                 textField.setPrefWidth(175);
                 textField.setOnKeyReleased(keyEvent -> keyPressDetector(textField, keyEvent));
+                yOffset += textField.getLayoutBounds().getHeight() + 6;
                 option.textField = textField;
                 option.type = "keyBind";
                 parent.getChildren().addAll(fieldName, textField);
@@ -142,8 +153,10 @@ public class SettingsView implements PopOut {
             case "toggle" -> {
                 CheckBox checkBox = new CheckBox();
                 checkBox.setSelected(setting.bool());
-                checkBox.setLayoutY(yOffset + 6);
+//                yOffset -= 5;
+                checkBox.setLayoutY(yOffset);
                 parent.getChildren().addAll(fieldName, checkBox);
+                yOffset += checkBox.getLayoutBounds().getHeight() + 6;
                 option.checkBox = checkBox;
                 option.type = "checkBox";
             }
@@ -151,7 +164,8 @@ public class SettingsView implements PopOut {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
                 choiceBox.getItems().addAll(VideoChecks.getSizesString());
                 choiceBox.setValue(setting.value);
-                choiceBox.setLayoutY(yOffset + 6);
+                choiceBox.setLayoutY(yOffset);
+                yOffset += choiceBox.getLayoutBounds().getHeight()  + 6;
                 parent.getChildren().addAll(fieldName, choiceBox);
                 option.choiceBox = choiceBox;
                 option.type = "choiceBox";
@@ -160,7 +174,8 @@ public class SettingsView implements PopOut {
                 ChoiceBox<String> choiceBox = new ChoiceBox<>();
                 choiceBox.getItems().addAll(VideoChecks.getEncodersString());
                 choiceBox.setValue(setting.value);
-                choiceBox.setLayoutY(yOffset + 6);
+                choiceBox.setLayoutY(yOffset);
+                yOffset += choiceBox.getLayoutBounds().getHeight() + 6;
                 parent.getChildren().addAll(fieldName, choiceBox);
                 option.choiceBox = choiceBox;
                 option.type = "choiceBox";
@@ -168,14 +183,17 @@ public class SettingsView implements PopOut {
             case "text" -> {
                 TextField textField = new TextField();
                 textField.setText(setting.value);
-                textField.setLayoutY(yOffset + 5);
+                yOffset += 6;
+                textField.setLayoutY(yOffset);
                 textField.setPrefWidth(350);
                 option.textField = textField;
                 option.type = "text";
                 parent.getChildren().addAll(fieldName, textField);
             }
-        }
+        };
+        System.out.println("End " + yOffset);
         options.add(option);
+        return yOffset + 32;
     }
 
     private void makeDirectorySelector(TextField textField, String directory) {
@@ -197,24 +215,24 @@ public class SettingsView implements PopOut {
         System.out.println("Saving");
         for (OptionWrapper option : options) {
             switch (option.type) {
-                case "textField" -> {
-                    JSONObject object = SettingsWrapper.getRawObject(option.name).put("value", option.textField.getText());
+                case "textField", "keyBind" -> {
+                    JSONObject object = SettingsWrapper.getRawObject(option.key).put("value", option.textField.getText());
                     SettingsWrapper.updateSetting(option.name, object);
                 }
                 case "checkBox" -> {
                     String value = option.checkBox.isSelected() ? "true" : "false";
-                    JSONObject object = SettingsWrapper.getRawObject(option.name).put("value", value);
+                    JSONObject object = SettingsWrapper.getRawObject(option.key).put("value", value);
                     SettingsWrapper.updateSetting(option.name, object);
                 }
                 case "choiceBox" -> {
-                    JSONObject object = SettingsWrapper.getRawObject(option.name).put("value", option.choiceBox.getValue());
+                    JSONObject object = SettingsWrapper.getRawObject(option.key).put("value", option.choiceBox.getValue());
                     SettingsWrapper.updateSetting(option.name, object);
                 }
             }
         }
         SettingsWrapper.saveSettings();
-        options.clear();
-        build();
+//        options.clear();
+//        build();
     }
 
     public void onResetPressed(MouseEvent mouseEvent) throws IOException {

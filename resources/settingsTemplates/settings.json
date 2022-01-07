@@ -35,10 +35,10 @@
     "group": "Encoding"
   },
   "preferredCompatibilityEncoder":  {
-    "name": "preferredCompatibilityEncoder",
+    "name": "Preferred HWAccel Encoder",
     "type": "encoderEnum",
     "value": "libx264",
-    "description": "The preferred encoder to select for when converting to a compatible format.",
+    "description": "\nThe preferred encoder to select for when converting to a compatible format.",
     "group": "Encoding"
   },
   "defaultAllow100MB": {
@@ -52,7 +52,7 @@
     "name": "Use Full CPU",
     "type": "toggle",
     "value": "true",
-    "description": "Whether or not to use full CPU in vp9 encoding.",
+    "description": "Whether or not to use full CPU in vp9 encoding. \n(Reduces compression, but allows for higher speed)",
     "group": "Encoding"
   },
   "preferredVideoSize": {
@@ -63,7 +63,7 @@
     "group": "Encoding"
   },
   "defaultAudioVolume": {
-    "name": "defaultAudioVolume",
+    "name": "Default audio volume",
     "type": "text",
     "value": "1",
     "description": "The default audio volume to use.",
@@ -102,6 +102,20 @@
     "type": "keyBind",
     "value": "Left",
     "description": "The key to use to skip backward one second.",
+    "group": "Keybinds"
+  },
+  "previewClip": {
+    "name": "Preview Clip",
+    "type": "keyBind",
+    "value": "P",
+    "description": "The key to use to preview the current clip.",
+    "group": "Keybinds"
+  },
+  "clipIt": {
+    "name": "Clip It",
+    "type": "keyBind",
+    "value": "Enter",
+    "description": "Launches the clipIt window.",
     "group": "Keybinds"
   }
 }

@@ -20,14 +20,16 @@ public class SettingsWrapper {
 
 
     public static class setting{
+        public String key;
         public String name;
         public String value;
         public String type;
         public String description;
         public String group;
 
-        setting(JSONObject jsonObject){
+        setting(String key, JSONObject jsonObject){
             try {
+                this.key = key;
                 this.name = jsonObject.getString("name");
                 this.value = jsonObject.getString("value");
                 this.type = jsonObject.getString("type");
@@ -97,7 +99,7 @@ public class SettingsWrapper {
         ArrayList<setting> settings = new ArrayList<>();
         for (String key : templateJSON.keySet()) {
             try {
-                settings.add(new setting(settingsJSON.getJSONObject(key)));
+                settings.add(new setting(key, settingsJSON.getJSONObject(key)));
             } catch (JSONException e) {
                 settings.add(repairSetting(key));
             }
@@ -107,12 +109,12 @@ public class SettingsWrapper {
 
     private static setting repairSetting(String badKey){
         settingsJSON.put(badKey, templateJSON.getJSONObject(badKey));
-        return new setting(templateJSON.getJSONObject(badKey));
+        return new setting(badKey, templateJSON.getJSONObject(badKey));
     }
 
     public static setting getSetting(String key) {
         try {
-            return new setting(settingsJSON.getJSONObject(key));
+            return new setting(key, settingsJSON.getJSONObject(key));
         } catch (JSONException e) {
             return repairSetting(key);
         }
