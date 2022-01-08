@@ -183,8 +183,9 @@ public class SettingsView implements PopOut {
             case "text" -> {
                 TextField textField = new TextField();
                 textField.setText(setting.value);
-                yOffset += 6;
+//                yOffset += 6;
                 textField.setLayoutY(yOffset);
+                yOffset += textField.getLayoutBounds().getHeight() + 6;
                 textField.setPrefWidth(350);
                 option.textField = textField;
                 option.type = "text";
@@ -193,7 +194,7 @@ public class SettingsView implements PopOut {
         };
 //        System.out.println("End " + yOffset);
         options.add(option);
-        return yOffset + 32;
+        return yOffset + 34;
     }
 
     private void makeDirectorySelector(TextField textField, String directory) {

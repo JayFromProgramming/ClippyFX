@@ -66,6 +66,7 @@ public class MainController {
     private float fps = 30;
     private ArrayList<PopOut> popOuts = new ArrayList<>();
     private PegGenerator pegGenerator;
+    private final Runtime runtime = Runtime.getRuntime();
 
     private String timeFormatter(double time) {
         int hours = (int) (time / 3600);
@@ -171,6 +172,9 @@ public class MainController {
                 clipStartText.setText(timeFormatter(clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
                 scrubBarText.setText(timeFormatter(scrubBar.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
                 clipEndText.setText(timeFormatter(clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
+                ((Stage) Pain.getScene().getWindow()).setTitle("ClippyFX: Mem: ("
+                         + (Math.round(runtime.freeMemory() / 1.049e+6)) + "MB / " +
+                        Math.round((runtime.totalMemory() / 1.049e+6)) + " MB) FPS: ??");
             }
         };
         timer.start();
@@ -209,7 +213,7 @@ public class MainController {
         setEnabledUI(false);
         LoadPane.setVisible(true);
         VideoURI.clear();
-
+        runtime.gc(); // Force garbage collection
     }
 
     protected double calcFrameRate(String ffprobeOutput) {

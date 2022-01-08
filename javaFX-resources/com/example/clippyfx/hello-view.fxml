@@ -16,7 +16,7 @@
     </padding>
 
     <Label fx:id="welcomeText" />
-   <AnchorPane fx:id="Pain" prefHeight="702.0" prefWidth="1240.0">
+   <AnchorPane fx:id="Pain" onKeyPressed="#keyPressed" prefHeight="702.0" prefWidth="1240.0">
       <children>
          <AnchorPane fx:id="VideoPain" layoutY="14.0" maxHeight="541.0" maxWidth="909.0" prefHeight="541.0" prefWidth="909.0">
             <children>

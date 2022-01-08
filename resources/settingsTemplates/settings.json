@@ -69,6 +69,13 @@
     "description": "The default audio volume to use.",
     "group": "Playback"
   },
+  "forceGarbageCollection": {
+    "name": "Force garbage collection on eject",
+    "type": "toggle",
+    "value": "false",
+    "description": "\nWhether or not to force the JVM to garbage collect on media eject.",
+    "group": "Playback"
+  },
   "playPauseKey": {
     "name": "Play/Pause Key",
     "type": "keyBind",
