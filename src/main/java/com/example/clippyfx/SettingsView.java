@@ -191,7 +191,7 @@ public class SettingsView implements PopOut {
                 parent.getChildren().addAll(fieldName, textField);
             }
         };
-        System.out.println("End " + yOffset);
+//        System.out.println("End " + yOffset);
         options.add(option);
         return yOffset + 32;
     }

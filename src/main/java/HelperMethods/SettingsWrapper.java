@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class SettingsWrapper {
@@ -122,10 +123,10 @@ public class SettingsWrapper {
 
     public static KeyCode keyBind(String key){
         try {
-            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value"));
+            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value").toUpperCase(Locale.ROOT));
         } catch (JSONException e) {
             repairSetting(key);
-            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value"));
+            return KeyCode.valueOf(settingsJSON.getJSONObject(key).getString("value").toUpperCase(Locale.ROOT));
         }
     }
 }

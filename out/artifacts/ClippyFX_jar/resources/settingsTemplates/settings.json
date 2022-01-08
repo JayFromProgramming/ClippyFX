@@ -1,44 +1,121 @@
 {
   "defaultAdvancedLoadPath": {
-    "name": "defaultAdvancedLoadPath",
+    "name": "Default file load path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to load files from."
+    "description": "The default path to load files from.",
+    "group": "Save and Load"
   },
   "defaultAdvancedSavePath": {
-    "name": "defaultAdvancedSavePath",
+    "name": "Default file save path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to save files to."
+    "description": "The default path to save files to.",
+    "group": "Save and Load"
+  },
+  "defaultURLSavePath": {
+    "name": "Default URL save path",
+    "type": "filePath",
+    "value": "C:\\Users\\Public\\Videos",
+    "description": "The default path to save URLs to.",
+    "group": "Save and Load"
   },
   "defaultYoutubeSavePath": {
-    "name": "defaultYoutubeSavePath",
+    "name": "Default YouTube save path",
     "type": "filePath",
     "value": "C:\\Users\\Public\\Videos",
-    "description": "The default path to save youtube clips to."
-  },
-  "defaultAllow100MB": {
-    "name": "defaultAllow100MB",
-    "type": "toggle",
-    "value": "false",
-    "description": "Whether or not to allow 100MB files instead of the default 8MB."
-  },
-  "preferredVideoSize": {
-    "name": "preferredVideoSize",
-    "type": "sizeEnum",
-    "value": "Source",
-    "description": "The preferred video size to select."
+    "description": "The default path to save youtube clips to.",
+    "group": "Save and Load"
   },
   "preferredOutputEncoder": {
     "name": "preferredOutputEncoder",
     "type": "encoderEnum",
     "value": "libvpx_vp9",
-    "description": "The preferred encoder to select for output."
+    "description": "The preferred encoder to select for output.",
+    "group": "Encoding"
   },
   "preferredCompatibilityEncoder":  {
-    "name": "preferredCompatibilityEncoder",
+    "name": "Preferred HWAccel Encoder",
     "type": "encoderEnum",
     "value": "libx264",
-    "description": "The preferred encoder to select for when converting to a compatible format."
+    "description": "\nThe preferred encoder to select for when converting to a compatible format.",
+    "group": "Encoding"
+  },
+  "defaultAllow100MB": {
+    "name": "Allow 100MB",
+    "type": "toggle",
+    "value": "false",
+    "description": "Whether or not to allow 100MB files instead of the default 8MB.",
+    "group": "Encoding"
+  },
+  "defaultUseFullCPU": {
+    "name": "Use Full CPU",
+    "type": "toggle",
+    "value": "true",
+    "description": "Whether or not to use full CPU in vp9 encoding. \n(Reduces compression, but allows for higher speed)",
+    "group": "Encoding"
+  },
+  "preferredVideoSize": {
+    "name": "preferredVideoSize",
+    "type": "sizeEnum",
+    "value": "Source",
+    "description": "The preferred video size to select.",
+    "group": "Encoding"
+  },
+  "defaultAudioVolume": {
+    "name": "Default audio volume",
+    "type": "text",
+    "value": "1",
+    "description": "The default audio volume to use.",
+    "group": "Playback"
+  },
+  "playPauseKey": {
+    "name": "Play/Pause Key",
+    "type": "keyBind",
+    "value": "Space",
+    "description": "The key to use to play/pause.",
+    "group": "Keybinds"
+  },
+  "nextFrame": {
+    "name": "Next Frame",
+    "type": "keyBind",
+    "value": "Period",
+    "description": "The key to use to go to the next frame.",
+    "group": "Keybinds"
+  },
+  "previousFrame": {
+    "name": "Previous Frame",
+    "type": "keyBind",
+    "value": "Comma",
+    "description": "The key to use to go to the previous frame.",
+    "group": "Keybinds"
+  },
+  "skipForward": {
+    "name": "Skip Forward",
+    "type": "keyBind",
+    "value": "Right",
+    "description": "The key to use to skip forward one second.",
+    "group": "Keybinds"
+  },
+  "skipBackward": {
+    "name": "Skip Backward",
+    "type": "keyBind",
+    "value": "Left",
+    "description": "The key to use to skip backward one second.",
+    "group": "Keybinds"
+  },
+  "previewClip": {
+    "name": "Preview Clip",
+    "type": "keyBind",
+    "value": "P",
+    "description": "The key to use to preview the current clip.",
+    "group": "Keybinds"
+  },
+  "clipIt": {
+    "name": "Clip It",
+    "type": "keyBind",
+    "value": "Enter",
+    "description": "Launches the clipIt window.",
+    "group": "Keybinds"
   }
 }
