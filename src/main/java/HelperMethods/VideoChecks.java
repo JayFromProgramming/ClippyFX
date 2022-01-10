@@ -129,7 +129,7 @@ public class VideoChecks {
         try {
 //            System.out.println("Checking for h264_nvenc...");
             Process hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_nvenc -frames 1 -f null NUL");
-            String result = StreamedCommand.returnErrorString(hwaccel, 1);
+            String result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_nvenc);
                 System.out.println("Found h264_nvenc");
@@ -138,7 +138,7 @@ public class VideoChecks {
             }
 //            System.out.println("Checking for h264_amf...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_amf -frames 1 -f null NUL");
-            result = StreamedCommand.returnErrorString(hwaccel, 1);
+            result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_amf);
                 System.out.println("Found h264_amf");
@@ -147,7 +147,7 @@ public class VideoChecks {
             }
 //            System.out.println("Checking for h264_qsv...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_qsv -frames 1 -f null NUL");
-            result = StreamedCommand.returnErrorString(hwaccel, 1);
+            result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_qsv);
                 System.out.println("Found h264_qsv");

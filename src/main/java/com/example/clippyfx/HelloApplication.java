@@ -38,7 +38,10 @@ public class HelloApplication extends Application {
         controller.Pain.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);
         controller.Pain.setOnDragOver(controller::onDragOver);
         controller.Pain.setOnDragDropped(controller::onDragNDrop);
+        controller.startAnimations();
         Thread.setDefaultUncaughtExceptionHandler(controller::onUncaughtException);
+        Runtime runtime = Runtime.getRuntime();
+        runtime.gc();
     }
 
     public static void main(String[] args) throws IOException {

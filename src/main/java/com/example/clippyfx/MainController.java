@@ -86,6 +86,31 @@ public class MainController {
         }
     }
 
+    public void startAnimations(){
+        timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+
+                if (popOuts.removeIf(popOut -> !popOut.isAlive())) runtime.gc();
+
+                String title = "ClippyFX: Mem: (" + (Math.round(runtime.freeMemory() / 1.049e+6))
+                        + "MB / " + Math.round((runtime.totalMemory() / 1.049e+6)) + " MB)";
+                if (mediaPlayer != null) {
+                    title = title +" - " + mediaPlayer.getStatus().toString();
+                } else {
+                    title = title + " - No Media";
+                }
+
+                if (scrubbing) title += " | Scrubbing";
+                for (PopOut popOut : popOuts) {
+                    title += " | " + popOut.getType() + " Open";
+                }
+                ((Stage) Pain.getScene().getWindow()).setTitle(title);
+            }
+        };
+        timer.start();
+    }
+
     protected void onDragOver(DragEvent event) {
         if (event.getDragboard().hasFiles()) {
             File file = event.getDragboard().getFiles().get(0);
@@ -172,9 +197,6 @@ public class MainController {
                 clipStartText.setText(timeFormatter(clipStart.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
                 scrubBarText.setText(timeFormatter(scrubBar.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
                 clipEndText.setText(timeFormatter(clipEnd.getValue() / 100 * mediaPlayer.getTotalDuration().toSeconds()));
-                ((Stage) Pain.getScene().getWindow()).setTitle("ClippyFX: Mem: ("
-                         + (Math.round(runtime.freeMemory() / 1.049e+6)) + "MB / " +
-                        Math.round((runtime.totalMemory() / 1.049e+6)) + " MB) FPS: ??");
             }
         };
         timer.start();
@@ -213,6 +235,7 @@ public class MainController {
         setEnabledUI(false);
         LoadPane.setVisible(true);
         VideoURI.clear();
+        mediaPlayer = null;
         runtime.gc(); // Force garbage collection
     }
 

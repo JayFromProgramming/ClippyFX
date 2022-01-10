@@ -232,8 +232,8 @@ public class SettingsView implements PopOut {
             }
         }
         SettingsWrapper.saveSettings();
-//        options.clear();
-//        build();
+        options.clear();
+        build();
     }
 
     public void onResetPressed(MouseEvent mouseEvent) throws IOException {
