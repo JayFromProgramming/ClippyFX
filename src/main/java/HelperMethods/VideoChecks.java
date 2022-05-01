@@ -116,7 +116,13 @@ public class VideoChecks {
         String[] errorSplit = result.split("Error");
         if (errorSplit.length > 1) {
             return " Error" + errorSplit[1];
-        }else return result;
+        }else {
+            return " " + result;
+        }
+    }
+
+    private static boolean actualError(String result) {
+        return result.contains("Error") || result.contains("error") || result.contains("unsupported");
     }
 
     public static void checkEncoders() {
@@ -127,30 +133,39 @@ public class VideoChecks {
         System.out.println("Expecting libx264");
         System.out.println("Expecting libvpx_vp9");
         try {
-//            System.out.println("Checking for h264_nvenc...");
             Process hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_nvenc -frames 1 -f null NUL");
             String result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_nvenc);
                 System.out.println("Found h264_nvenc");
+            }else if(!actualError(result)){
+                System.out.println("Unable to determine if h264_nvenc is available.\nAssuming h264_nvenc is available: "
+                        + printEncoderError(result));
+                AVAILABLE_ENCODERS.add(Encoders.h264_nvenc);
             } else {
                 System.out.println("Failed to find h264_nvenc:" + printEncoderError(result));
             }
-//            System.out.println("Checking for h264_amf...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_amf -frames 1 -f null NUL");
             result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_amf);
                 System.out.println("Found h264_amf");
+            } else if(!actualError(result)){
+                System.out.println("Unable to determine if h264_amf is available.\nAssuming h264_amf is available: "
+                        + printEncoderError(result));
+                AVAILABLE_ENCODERS.add(Encoders.h264_amf);
             } else {
                 System.out.println("Failed to find h264_amf:" + printEncoderError(result));
             }
-//            System.out.println("Checking for h264_qsv...");
             hwaccel = StreamedCommand.runCommand("ffmpeg -i resources/videoResources/enCheck.webm -c:v h264_qsv -frames 1 -f null NUL");
             result = StreamedCommand.returnErrorString(hwaccel, 2);
             if (result.equals("")) {
                 AVAILABLE_ENCODERS.add(Encoders.h264_qsv);
                 System.out.println("Found h264_qsv");
+            } else if(!actualError(result)){
+                System.out.println("Unable to determine if h264_qsv is available.\nAssuming h264_qsv is available\n"
+                        + printEncoderError(result));
+                AVAILABLE_ENCODERS.add(Encoders.h264_qsv);
             } else {
                 System.out.println("Failed to find h264_qsv:" + printEncoderError(result));
             }
