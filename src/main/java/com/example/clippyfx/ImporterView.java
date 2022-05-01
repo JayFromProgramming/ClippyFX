@@ -144,9 +144,9 @@ public class ImporterView implements PopOut {
 
     private String selectHWACCEL(){
         return switch (typeBox.getSelectionModel().getSelectedItem().toString()) {
-            case "h264_nvenc" -> "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
-            case "h264_amf" -> "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
-            case "libx264" -> "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -preset:v p2 -cq:v 23 -b:a 128k -y \"%s\"";
+            case "h264_nvenc" -> "ffmpeg -i \"%s\" -c:v h264_nvenc -c:a aac -preset:v p2 -cq:v 26 -b:a 128k -y \"%s\"";
+            case "h264_amf" -> "ffmpeg -i \"%s\" -c:v h264_amf -c:a aac -quality:v speed -b:a 128k -y \"%s\"";
+            case "libx264" -> "ffmpeg -i \"%s\" -c:v libx264 -c:a aac -preset:v faster -cq:v 30 -b:a 128k -y \"%s\"";
             default -> throw new IllegalStateException("Unexpected value: " + typeBox.getSelectionModel().getSelectedItem());
         };
     }
