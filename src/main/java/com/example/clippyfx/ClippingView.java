@@ -38,6 +38,7 @@ public class ClippingView implements PopOut {
     public CheckBox sizeCap;
     public AnchorPane pain;
     public TextField fpsSelect;
+    public CheckBox open_toggle;
 
     private AnimationTimer timer;
     public double clipStart;
@@ -124,6 +125,14 @@ public class ClippingView implements PopOut {
                     ffmpegOutput.appendText("Clipping successful.");
                     System.out.println("Clipping successful.");
                     progressBar.setProgress(1);
+                    // Open the file in file explorer
+                    try {
+                        if (open_toggle.isSelected()) {
+                            Runtime.getRuntime().exec("explorer " + pathBox.getText());
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 clipItButton.setDisable(true);
                 stop();

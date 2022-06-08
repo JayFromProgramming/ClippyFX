@@ -20,7 +20,7 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, InterruptedException {
-        int num = 02635;
+        int num = 02635; // Just a random number
         System.out.println(num);
         String check = StreamedCommand.getCommandOutput("ffmpeg -version");
         if (check.contains("ffmpeg version")) {
