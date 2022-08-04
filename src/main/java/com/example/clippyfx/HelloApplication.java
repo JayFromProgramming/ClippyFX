@@ -29,6 +29,11 @@ public class HelloApplication extends Application {
             System.out.println("FFmpeg is not installed");
             System.exit(-27);
         }
+        if (runUpdateCheck()){
+            System.out.println("New version found");
+        } else {
+            System.out.println("No new version found");
+        }
         new Thread(VideoChecks::checkEncoders).start();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
@@ -44,6 +49,28 @@ public class HelloApplication extends Application {
         Thread.setDefaultUncaughtExceptionHandler(controller::onUncaughtException);
         Runtime runtime = Runtime.getRuntime();
         runtime.gc();
+    }
+
+    private boolean runUpdateCheck() throws IOException, InterruptedException {
+        AutoUpdateView updateView = new AutoUpdateView(
+                "https://api.github.com/repos/JayFromProgramming/ClippyFX");
+         if (updateView.new_version_available()) {
+             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("update-view.fxml"));
+                Scene scene = new Scene(fxmlLoader.load(), 949, 686);
+                Stage stage = new Stage();
+                stage.setTitle("ClippyFX Update");
+                stage.setScene(scene);
+                stage.getIcons().add(new Image("file:resources/videoResources/Icon.png"));
+                stage.show();
+                AutoUpdateView controller = fxmlLoader.getController();
+                controller.pane.getScene().getWindow().addEventFilter(
+                        WindowEvent.WINDOW_CLOSE_REQUEST, controller::onClose);
+                // Wait for the window to close before continuing
+                while (stage.isShowing()) {
+                    Thread.sleep(100);
+                }
+         }
+        return false;
     }
 
     public static void main(String[] args) throws IOException {

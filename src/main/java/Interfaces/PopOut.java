@@ -12,7 +12,8 @@ public interface PopOut {
         ClippingView,
         ConverterView,
         YoutubeFinderView,
-        SettingsView
+        SettingsView,
+        AutoUpdateView,
     }
 
     /**
