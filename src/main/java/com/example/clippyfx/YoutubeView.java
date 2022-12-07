@@ -155,7 +155,7 @@ public class YoutubeView implements PopOut {
                         Uploaded on: %s
                         Length: %s
                         View Count: %s
-                        Like count: %s
+                        Like count: Probably 2
                         Dislike count: At least 1
                         Age limit: %s
 
@@ -166,7 +166,7 @@ public class YoutubeView implements PopOut {
                 date,
                 String.format("%02d:%02d:%02d", hours, minutes, seconds),
                 fm.format(this.json.getInt("view_count")),
-                fm.format(this.json.getInt("like_count")),
+//                fm.format(this.json.getInt("like_count")),
                 this.json.getInt("age_limit"),
                 this.json.getString("description"));
         videoInfo.setText(info);
