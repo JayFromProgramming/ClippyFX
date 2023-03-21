@@ -107,6 +107,14 @@ public class YoutubeView implements PopOut {
         BufferedReader reader = new BufferedReader(new InputStreamReader(frGetter.getInputStream()));
         String line = reader.readLine();
 //        System.out.println(line);
+        if (line == null){
+            this.videoTitle.setText("Error: Video not found");
+            findVideoButton.setDisable(false);
+            progressBar.setVisible(false);
+            this.videoInfo.setText("yt-dlp returned null...\n" +
+                    "Make sure yt-dlp is up to date (yt-dlp -U)");
+            return;
+        }
         this.json = new JSONObject(line);
         this.videoTitle.setText(this.json.getString("title"));
         this.updateThumbnail();
