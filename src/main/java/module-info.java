@@ -13,6 +13,7 @@ module com.example.clippyfx {
     requires org.json;
     requires org.apache.commons.lang3;
     requires java.management;
+    requires annotations;
 
     opens com.example.clippyfx to javafx.fxml;
     exports com.example.clippyfx;

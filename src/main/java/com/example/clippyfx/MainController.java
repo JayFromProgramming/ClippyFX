@@ -22,6 +22,7 @@ import javafx.animation.AnimationTimer;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class MainController {
     private boolean isPlaying = false;
     private boolean scrubbing = false;
     private float fps = 30;
-    private ArrayList<PopOut> popOuts = new ArrayList<>();
+    private final ArrayList<PopOut> popOuts = new ArrayList<>();
     private PegGenerator pegGenerator;
     private final Runtime runtime = Runtime.getRuntime();
 
@@ -76,6 +77,11 @@ public class MainController {
         return String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds);
     }
 
+    /**
+     * This method is called when the user attempts to close the application, its job is to make sure all other
+     * popouts are closed before closing the application.
+     * @param event The windowEvent that fired this method.
+     */
     public void onClose(WindowEvent event) {
         for (PopOut popOut : popOuts) {
             if(!popOut.close()) {
@@ -86,6 +92,9 @@ public class MainController {
         }
     }
 
+    /**
+     * This method starts the header bar text updates and will run until the application is closed.
+     */
     public void startAnimations(){
         timer = new AnimationTimer() {
             @Override
@@ -93,25 +102,29 @@ public class MainController {
 
                 if (popOuts.removeIf(popOut -> !popOut.isAlive())) runtime.gc();
 
-                String title = "ClippyFX: Mem: (" + (Math.round(runtime.freeMemory() / 1.049e+6))
-                        + "MB / " + Math.round((runtime.totalMemory() / 1.049e+6)) + " MB)";
+                StringBuilder title = new StringBuilder("ClippyFX: Mem: (" + (Math.round(runtime.freeMemory() / 1.049e+6))
+                        + "MB / " + Math.round((runtime.totalMemory() / 1.049e+6)) + " MB)");
                 if (mediaPlayer != null) {
-                    title = title +" - " + mediaPlayer.getStatus().toString();
+                    title.append(" - ").append(mediaPlayer.getStatus().toString());
                 } else {
-                    title = title + " - No Media";
+                    title.append(" - No Media");
                 }
 
-                if (scrubbing) title += " | Scrubbing";
+                if (scrubbing) title.append(" | Scrubbing");
                 for (PopOut popOut : popOuts) {
-                    title += " | " + popOut.getType() + " Open";
+                    title.append(" | ").append(popOut.getType()).append(" Open");
                 }
-                ((Stage) Pain.getScene().getWindow()).setTitle(title);
+                ((Stage) Pain.getScene().getWindow()).setTitle(title.toString());
             }
         };
         timer.start();
     }
 
-    protected void onDragOver(DragEvent event) {
+    /**
+     * This method is called when the user drags something over the application window.
+     * @param event The dragEvent that fired this method, it is checked to see if it is a file or a link
+     */
+    protected void onDragOver(@NotNull DragEvent event) {
         if (event.getDragboard().hasFiles()) {
             File file = event.getDragboard().getFiles().get(0);
             if (file.getName().endsWith(".mp4") || file.getName().endsWith(".mkv") || file.getName().endsWith(".avi")
@@ -130,7 +143,11 @@ public class MainController {
         event.consume();
     }
 
-    protected void onDragNDrop(DragEvent event){
+    /**
+     * This method is called when the user drops something onto the application window.
+     * @param event The dragEvent that fired this method, it is checked to see if it is a file or a link
+     */
+    protected void onDragNDrop(@NotNull DragEvent event){
         if (event.getDragboard().hasFiles()) {
             File file = event.getDragboard().getFiles().get(0);
             VideoURI.setText(file.toURI().toString());
@@ -158,7 +175,7 @@ public class MainController {
                 try {
                     loadURLFile(event.getDragboard().getString());
                 } catch (IOException | InterruptedException | URISyntaxException e) {
-                    System.out.println("Discord link dragNdropp failed");
+                    System.out.println("Discord link dragNdrop failed");
                     e.printStackTrace();
                 }
             }
@@ -171,7 +188,13 @@ public class MainController {
         loadURLFile(VideoURI.getText());
     }
 
-    protected void loadMedia(PegGenerator pegGenerator) throws IOException, URISyntaxException {
+    /**
+     * Loads media and starts the cliping process.
+     * @param pegGenerator The pegGenerator to load the media with
+     * @throws IOException If the media file cannot be found
+     * @throws URISyntaxException If the URI is not valid
+     */
+    protected void loadMedia(@NotNull PegGenerator pegGenerator) throws IOException, URISyntaxException {
         System.out.println("Media loading...");
         setEnabledUI(true);
         this.pegGenerator = pegGenerator;
@@ -212,6 +235,9 @@ public class MainController {
     }
 
 
+    /**
+     * @param enabled Whether the UI should be enabled or not
+     */
     private void setEnabledUI(boolean enabled) {
         clipStart.setDisable(!enabled);
         clipEnd.setDisable(!enabled);
@@ -226,6 +252,10 @@ public class MainController {
         cropItButton.setDisable(!enabled);
     }
 
+    /**
+     * Ejects the currently loaded media, and resets the ui for a new media to be loaded.
+     * @param mouseEvent The mouseEvent that fired this method (ignored)
+     */
     public void ejectMedia(MouseEvent mouseEvent) {
         System.out.println("Ejecting media...");
         mediaPlayer.stop();
@@ -424,7 +454,7 @@ public class MainController {
         }
     }
 
-    public void onUncaughtException(Thread thread, Throwable throwable) {
+    public void onUncaughtException(@NotNull Thread thread, @NotNull Throwable throwable) {
         System.out.println("Uncaught exception: " + throwable.getClass().getName());
         System.out.println("Thread: " + thread.getName());
         StringBuilder cause = new StringBuilder();
