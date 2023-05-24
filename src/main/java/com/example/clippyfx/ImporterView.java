@@ -302,7 +302,7 @@ public class ImporterView implements PopOut {
                 this.finishMethod.execute(this.pegGenerator);
             } else if (encoding.equals("h264")){
                 System.out.println("Converting container to mp4");
-                String command = "ffmpeg -i \"%s\" -c copy \"%s\"";
+                String command = "ffmpeg -i \"%s\" -c:v copy -c:a aac \"%s\"";
                 Process process = StreamedCommand.runCommand(String.format(command, pegGenerator.getLocation(),
                         nameBox.getText()));
                 process.waitFor();
