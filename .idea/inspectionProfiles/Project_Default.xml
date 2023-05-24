@@ -72,7 +72,7 @@
       <option name="myAdditionalJavadocTags" value="returns" />
     </inspection_tool>
     <inspection_tool class="JavadocDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ADDITIONAL_TAGS" value="returns" />
+      <option name="ADDITIONAL_TAGS" value="returns,note" />
     </inspection_tool>
     <inspection_tool class="MissingJavadoc" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="PACKAGE_SETTINGS">

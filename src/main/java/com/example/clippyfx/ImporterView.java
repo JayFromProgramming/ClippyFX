@@ -87,6 +87,13 @@ public class ImporterView implements PopOut {
             splitList = new ArrayList<>();
         }
 
+        /**
+         * Updates the window with the state of the video conversion.
+         * @param now
+         *            The timestamp of the current frame given in nanoseconds. This
+         *            value will be the same for all {@code AnimationTimers} called
+         *            during one frame.
+         */
         @Override
         public void handle(long now) {
             String line = null;
@@ -128,6 +135,10 @@ public class ImporterView implements PopOut {
         }
     }
 
+    /**
+     * Checks for the availability of hardware acceleration and selects the best one.
+     * If none are available, it will use CPU encoding.
+     */
     @SuppressWarnings("unchecked")
     private void checkHWACCEL() {
         ArrayList<VideoChecks.Encoders> encoders = VideoChecks.getEncoders();
@@ -157,8 +168,13 @@ public class ImporterView implements PopOut {
         return (double) Integer.parseInt(sections[0]) / (double) Integer.parseInt(sections[1]);
     }
 
+    /**
+     * Converts the video to a h264 mp4 file so that it can be displayed in the embedded player.
+     * @throws IOException if the file cannot be found
+     * @throws InterruptedException if the process is interrupted
+     */
     public void convertIt() throws IOException, InterruptedException {
-        if (clipping){
+        if (clipping) {
             FFmpegWrapper.killProcess(clipper);
             clipping=false;
             updater.stop();
@@ -170,7 +186,8 @@ public class ImporterView implements PopOut {
         String fileSaveName = nameBox.getText();
 
         ffmpegOutput.appendText("Starting conversion...\nCalculating duration and framerate...\n");
-        String probe_command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + fileName + "\"";
+        String probe_command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1" +
+                " -show_entries stream=r_frame_rate \"" + fileName + "\"";
         fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(probe_command));
         ffmpegOutput.appendText("Calculated framerate: " + fps + "\n");
         probe_command = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"" + fileName + "\"";
@@ -189,6 +206,12 @@ public class ImporterView implements PopOut {
     }
 
 
+    /**
+     * Called when the conversion is finished. Checks if the file exists and if it does it will
+     * mark it for deletion on exit and close the window.
+     * @note The temp file *will* be deleted on exit, so if needed it should be copied to a new location.
+     * @throws IOException if the file cannot be found
+     */
     private void finish() throws IOException {
         clipping = false;
         progressBar.setProgress(1);

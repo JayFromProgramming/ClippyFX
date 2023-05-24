@@ -144,6 +144,10 @@ public class ClippingView implements PopOut {
         return VideoChecks.Encoders.valueOf(presetBox.getValue().toString());
     }
 
+    /**
+     * Gets the size of the video to be clipped.
+     * @return The size of the video to be clipped.
+     */
     private VideoChecks.Sizes getSize() {
         if (videoSizeSelect.getValue().toString().equals("Source")) {
             return VideoChecks.Sizes.Source;
@@ -152,6 +156,12 @@ public class ClippingView implements PopOut {
         }
     }
 
+    /**
+     * Called when the user clicks the clipIt button.
+     * @param mouseEvent The mouse event that triggered the method. (Not used)
+     * @throws IOException If the file cannot be found.
+     * @throws InterruptedException If the process is interrupted.
+     */
     public void clipIt(MouseEvent mouseEvent) throws IOException, InterruptedException {
         if (clipping){
             FFmpegWrapper.killProcess(clipper);
@@ -178,6 +188,11 @@ public class ClippingView implements PopOut {
         // TODO: GIANT GREEN CHECK MARK BABYYY WHOOOOOOOOOOO - Nick
     }
 
+    /**
+     * The method used to pass the media player and peg generator to this class.
+     * @param mediaPlayer  The media player to be used.
+     * @param pegGenerator The peg generator to be used.
+     */
     @SuppressWarnings("unchecked")
     public void passObjects(MediaPlayer mediaPlayer, PegGenerator pegGenerator) {
         closeHook(this.pain);
