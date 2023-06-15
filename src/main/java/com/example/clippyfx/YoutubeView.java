@@ -116,16 +116,16 @@ public class YoutubeView implements PopOut {
             return;
         }
         this.json = new JSONObject(line);
-        this.videoTitle.setText(this.json.getString("title"));
+        this.videoTitle.setText(this.json.optString("title"));
         this.updateThumbnail();
         this.fillTable();
         findVideoButton.setDisable(false);
         submitButton.setDisable(false);
         JSONArray formats = this.json.getJSONArray("formats");
         for (int i = formats.length() - 1; i >= 0; i--){
-            if (!formats.getJSONObject(i).getString("vcodec").equals("none") &&
-                    !formats.getJSONObject(i).getString("acodec").equals("none")){
-                mainURI = formats.getJSONObject(i).getString("url");
+            if (!formats.getJSONObject(i).optString("vcodec").equals("none") &&
+                    !formats.getJSONObject(i).optString("acodec").equals("none")){
+                mainURI = formats.getJSONObject(i).optString("url");
                 break;
             }
         }
@@ -136,47 +136,71 @@ public class YoutubeView implements PopOut {
         JSONArray thumbs = this.json.getJSONArray("thumbnails");
 
         for (int i = thumbs.length() - 1; i > 0; i--){
-            if (StringUtils.substringAfterLast(thumbs.getJSONObject(i).getString("url"), ".").equals("jpg")){
-                this.thumbnailURI = thumbs.getJSONObject(i).getString("url");
+            // Check if the url contains somewhere in it .jpg
+            if (thumbs.getJSONObject(i).optString("url").contains(".jpg")){
+                this.thumbnailURI = thumbs.getJSONObject(i).optString("url");
                 System.out.println(this.thumbnailURI);
                 break;
             }
+//            if (StringUtils.substringAfterLast(thumbs.getJSONObject(i).getString("url"), ".").equals("jpg")){
+//                this.thumbnailURI = thumbs.getJSONObject(i).getString("url");
+//                System.out.println(this.thumbnailURI);
+//                break;
+//            }
+        }
+        if (this.thumbnailURI == null){
+            return;
         }
         thumbnailViewer.setImage(new javafx.scene.image.Image(thumbnailURI));
     }
 
     private void fillTable(){
+        System.out.println(this.json.toString(4));
         NumberFormat fm = NumberFormat.getInstance();
-        String date = this.json.getString("upload_date");
-        date = date.substring(4, 6) + "/" + date.substring(5, 7) + "/" + date.substring(0, 4);
-        int totalSecs = this.json.optInt("duration");
+        String date = this.json.optString("upload_date");
+        if (date.length() != 8) {
+            System.out.println("Warning: upload date is not 8 characters");
+        } else {
+            date = date.substring(4, 6) + "/" + date.substring(5, 7) + "/" + date.substring(0, 4);
+        }
+        float totalSecs = this.json.optFloat("duration");
         if (totalSecs == 0) {
             System.out.println("Warning: duration is 0");
         }
-        int hours = totalSecs / 3600;
-        int minutes = (totalSecs % 3600) / 60;
-        int seconds = totalSecs % 60;
+        int hours = (int) (totalSecs / 3600);
+        int minutes = (int) ((totalSecs % 3600) / 60);
+        int seconds = (int) (totalSecs % 60);
+        int millis = (int) ((totalSecs - (int) totalSecs) * 1000);
+
+        String website = this.json.optString("webpage_url");
+        // Convert to just the top level domain
+        website = website.substring(website.indexOf("://") + 3);
+        website = website.substring(0, website.indexOf("/"));
+
+
         String info = String.format("""
+                        Website: %s
+                        Extractor: %s
                         Resolution: %s
                         Framerate: %s fps
                         Uploaded by: %s
                         Uploaded on: %s
                         Length: %s
                         View Count: %s
-                        Like count: Probably 2
-                        Dislike count: At least 1
                         Age limit: %s
 
                         Description: %s""",
-                this.json.getString("resolution"),
-                this.json.getInt("fps"),
-                this.json.getString("uploader"),
+                website,
+                this.json.optString("extractor"),
+                this.json.optString("resolution"),
+                this.json.optInt("fps"),
+                this.json.optString("uploader"),
                 date,
-                String.format("%02d:%02d:%02d", hours, minutes, seconds),
-                fm.format(this.json.getInt("view_count")),
+                String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis),
+                fm.format(this.json.optInt("view_count")),
 //                fm.format(this.json.getInt("like_count")),
-                this.json.getInt("age_limit"),
-                this.json.getString("description"));
+                this.json.optInt("age_limit"),
+                this.json.optString("description"));
         videoInfo.setText(info);
     }
 
