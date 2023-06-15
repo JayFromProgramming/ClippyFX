@@ -12,6 +12,7 @@ import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,13 +30,19 @@ public class HelloApplication extends Application {
             System.out.println("FFmpeg is not installed");
             System.exit(-27);
         }
-        if (runUpdateCheck()){
-            System.out.println("New version found");
-        } else {
-            System.out.println("No new version found");
-        }
+//        if (runUpdateCheck()){
+//            System.out.println("New version found");
+//        } else {
+//            System.out.println("No new version found");
+//        }
         new Thread(VideoChecks::checkEncoders).start();
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        // URL to the FXML file
+        URL view = HelloApplication.class.getResource("/hello-view.fxml");
+        if (view == null) {
+            System.out.println("View object is null");
+            System.exit(-1);
+        }
+        FXMLLoader fxmlLoader = new FXMLLoader(view);
         Scene scene = new Scene(fxmlLoader.load(), 949, 686);
         stage.setTitle("ClippyFX");
         stage.setScene(scene);
@@ -55,7 +62,7 @@ public class HelloApplication extends Application {
         AutoUpdateView updateView = new AutoUpdateView(
                 "https://api.github.com/repos/JayFromProgramming/ClippyFX");
          if (updateView.new_version_available()) {
-             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("update-view.fxml"));
+             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/update-view.fxml"));
                 Scene scene = new Scene(fxmlLoader.load(), 949, 686);
                 Stage stage = new Stage();
                 stage.setTitle("ClippyFX Update");

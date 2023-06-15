@@ -359,7 +359,7 @@ public class MainController {
                 }
             }
         }
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("clipping-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/clipping-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX Clipping");
@@ -378,7 +378,7 @@ public class MainController {
     }
 
     public void loadURLFile(String link) throws IOException, URISyntaxException, InterruptedException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX: Advanced video loader");
@@ -391,7 +391,7 @@ public class MainController {
     }
 
     public void loadFileDirect(File file) throws IOException, InterruptedException, URISyntaxException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX: Advanced video loader");
@@ -413,7 +413,7 @@ public class MainController {
                 }
             }
         }
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("compatablityator-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/compatablityator-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX: Advanced video loader");
@@ -439,7 +439,7 @@ public class MainController {
                 }
             }
         }
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("youtube-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/youtube-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 213);
         Stage stage = new Stage();
         stage.setTitle("ClippyFX: Youtube video loader");
