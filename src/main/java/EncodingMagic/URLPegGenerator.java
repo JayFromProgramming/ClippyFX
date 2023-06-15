@@ -67,12 +67,12 @@ public class URLPegGenerator implements PegGenerator {
 
     @Override
     public String getName() {
-        return null;
+        return StringUtils.substringAfterLast(fileLink, "/");
     }
 
     @Override
     public String getURI() {
-        return null;
+        return fileLink;
     }
 
     @Override

@@ -231,6 +231,10 @@ public class MainController {
         timer.start();
         if (pegGenerator.getType() == PegGenerator.PegType.Youtube) {
             fps = (float) pegGenerator.getFPS();
+        } else if (pegGenerator.getType() == PegGenerator.PegType.URI) {
+            String uri_object = pegGenerator.getURI();
+            String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + uri_object + "\"";
+            fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         } else {
             URI uri_object = new URI(VideoURI.getText());
             String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + Paths.get(uri_object) + "\"";
