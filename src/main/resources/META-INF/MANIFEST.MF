@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Main-Class: com.example.clippyfx.HelloApplication
+JavaFX-Application-Class: com.example.clippyfx.HelloApplication
+Class-Path: commons-lang3-3.12.0.jar javafx-web-17.0.0.1-win.jar javafx-
+ graphics-17.0.0.1-win.jar javafx-media-17.0.0.1-win.jar validatorfx-0.2
+ .1.jar javafx-graphics-17.0.0.1.jar tilesfx-17.0.11.jar formsfx-core-11
+ .4.2.jar bootstrapfx-core-0.4.0.jar javafx-fxml-17.0.0.1.jar javafx-med
+ ia-17.0.0.1.jar controlsfx-11.1.1.jar javafx-base-17.0.0.1-win.jar java
+ fx-controls-17.0.0.1.jar ikonli-core-12.2.0.jar ikonli-javafx-12.2.0.ja
+ r javafx-controls-17.0.0.1-win.jar javafx-web-17.0.0.1.jar json-2021120
+ 5.jar javafx-fxml-17.0.0.1-win.jar javafx-base-17.0.0.1.jar
+
