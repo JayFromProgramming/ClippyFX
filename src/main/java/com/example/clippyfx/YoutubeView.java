@@ -133,6 +133,9 @@ public class YoutubeView implements PopOut {
     }
 
     private void updateThumbnail(){
+        if (!this.json.has("thumbnails")){
+            return;
+        }
         JSONArray thumbs = this.json.getJSONArray("thumbnails");
 
         for (int i = thumbs.length() - 1; i > 0; i--){
@@ -206,7 +209,9 @@ public class YoutubeView implements PopOut {
 
     public void submitURI(MouseEvent mouseEvent) throws IOException {
         videoURI.setText(mainURI);
+        System.out.println("Submitted URI: " + mainURI);
         this.isAlive = false;
+        this.getPegGenerator().passMetaData(this.json.optFloat("fps"), this.json.optFloat("duration"));
         finishMethod.execute(this.getPegGenerator());
         ((Stage) pane.getScene().getWindow()).close();
     }

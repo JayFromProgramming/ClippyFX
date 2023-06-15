@@ -21,10 +21,10 @@ public class YoutubePegGenerator implements PegGenerator {
     private double END_TIME;
     private double CLIP_SPEED;
     private double CLIP_VOLUME;
-    private double sourceFrameRate;
+    private float sourceFrameRate;
     private int sourceHeight;
-    private int sourceDuration;
-    private double sourceFps;
+    private float sourceDuration;
+    private float sourceFps;
     public int cropX1;
     public int cropX2;
     public int cropY1;
@@ -113,9 +113,9 @@ public class YoutubePegGenerator implements PegGenerator {
     }
 
     @Override
-    public void passMetaData(double source_fps, double source_duration) {
-       this.sourceDuration = this.youtubeData.getInt("duration");
-       this.sourceFrameRate = this.youtubeData.getInt("fps");
+    public void passMetaData(float source_fps, float source_duration) {
+       this.sourceDuration = this.youtubeData.optFloat("duration");
+       this.sourceFrameRate = this.youtubeData.optFloat("fps");
     }
 
     @Override

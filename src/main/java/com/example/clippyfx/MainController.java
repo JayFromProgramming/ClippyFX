@@ -224,7 +224,7 @@ public class MainController {
         };
         timer.start();
         if (pegGenerator.getType() == PegGenerator.PegType.Youtube) {
-            fps = 30;
+            pegGenerator.getFPS();
         } else {
             URI uri_object = new URI(VideoURI.getText());
             String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + Paths.get(uri_object) + "\"";
@@ -372,7 +372,7 @@ public class MainController {
         this.pegGenerator.loadClipBounds(start, end, speedSlider.getValue() / 100,
                 volumeSlider.getValue() / 100);
         ClippingView clippingProgressWindow = fxmlLoader.getController();
-        this.pegGenerator.passMetaData(this.fps, this.mediaPlayer.getTotalDuration().toSeconds());
+        this.pegGenerator.passMetaData(this.fps, (float) this.mediaPlayer.getTotalDuration().toSeconds());
         clippingProgressWindow.passObjects(mediaPlayer, this.pegGenerator);
         popOuts.add(clippingProgressWindow);
     }
