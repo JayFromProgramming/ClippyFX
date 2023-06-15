@@ -237,6 +237,9 @@ public class YoutubeView implements PopOut {
             System.out.print("Warning: extractor is generic\n");
             // Use the url peg generator instead of the youtube one
             this.createImporter();
+            this.isAlive = false;
+//            finishMethod.execute(this.getPegGenerator());
+            ((Stage) pane.getScene().getWindow()).close();
             return;
         } else {
             gen = this.getPegGenerator();
