@@ -111,7 +111,7 @@ public class FilePegGenerator implements PegGenerator {
     }
 
     @Override
-    public void passMetaData(float source_fps, float source_duration) {
+    public void passMetaData(double source_fps, double source_duration) {
         this.sourceFps = source_fps;
         this.sourceTotalFrames = (int) (source_duration * sourceFps);
     }

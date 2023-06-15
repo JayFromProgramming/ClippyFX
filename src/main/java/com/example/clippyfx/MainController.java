@@ -162,23 +162,29 @@ public class MainController {
                 }
             }
         } else if (event.getDragboard().hasString()) {
-            if (event.getDragboard().getString().contains("youtube.com/watch?v=")
-                    || event.getDragboard().getString().contains("youtu.be/")) {
-                try {
-                    loadYoutube(event.getDragboard().getString());
-                } catch (IOException e) {
-                    System.out.println("Youtube link dragNdrop failed");
-                    e.printStackTrace();
-                }
-            }else if (event.getDragboard().getString().contains("http://") ||
-                    event.getDragboard().getString().contains("https://")) {
-                try {
-                    loadURLFile(event.getDragboard().getString());
-                } catch (IOException | InterruptedException | URISyntaxException e) {
-                    System.out.println("Discord link dragNdrop failed");
-                    e.printStackTrace();
-                }
+            try {
+                loadYoutube(event.getDragboard().getString());
+            } catch (IOException e) {
+                System.out.println("link dragNdrop failed");
+                e.printStackTrace();
             }
+//            if (event.getDragboard().getString().contains("youtube.com/watch?v=")
+//                    || event.getDragboard().getString().contains("youtu.be/")) {
+//                try {
+//                    loadYoutube(event.getDragboard().getString());
+//                } catch (IOException e) {
+//                    System.out.println("Youtube link dragNdrop failed");
+//                    e.printStackTrace();
+//                }
+//            }else if (event.getDragboard().getString().contains("http://") ||
+//                    event.getDragboard().getString().contains("https://")) {
+//                try {
+//                    loadURLFile(event.getDragboard().getString());
+//                } catch (IOException | InterruptedException | URISyntaxException e) {
+//                    System.out.println("Discord link dragNdrop failed");
+//                    e.printStackTrace();
+//                }
+//            }
         }
         event.consume();
     }
@@ -224,12 +230,13 @@ public class MainController {
         };
         timer.start();
         if (pegGenerator.getType() == PegGenerator.PegType.Youtube) {
-            pegGenerator.getFPS();
+            fps = (float) pegGenerator.getFPS();
         } else {
             URI uri_object = new URI(VideoURI.getText());
             String command = "ffprobe -v error -select_streams v -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"" + Paths.get(uri_object) + "\"";
             fps = (float) calcFrameRate(StreamedCommand.getCommandOutput(command));
         }
+        if (Float.isNaN(fps)) fps = 30;
         System.out.println("FPS: " + fps);
         System.out.println("Media loaded.");
     }

@@ -47,7 +47,7 @@ public interface PegGenerator {
      */
     void setVideoYT(JSONObject youtubeData);
 
-    void passMetaData(float source_fps, float source_duration);
+    void passMetaData(double source_fps, double source_duration);
 
     void loadClipBounds(double start, double end, double speed, double volume);
 

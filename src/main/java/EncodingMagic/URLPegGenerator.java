@@ -10,8 +10,10 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
@@ -32,8 +34,11 @@ public class URLPegGenerator implements PegGenerator {
 
     public URLPegGenerator(){}
 
-    public URLPegGenerator(String url) throws URISyntaxException {
+    public URLPegGenerator(String url) throws MalformedURLException {
         this.fileLink = url;
+        // Download the file from the URL and store it in a temporary file named temp.mp4
+
+//        System.out.println("URLPegGenerator: " + url)
     }
 
     @Override
@@ -101,7 +106,7 @@ public class URLPegGenerator implements PegGenerator {
     }
 
     @Override
-    public void passMetaData(float source_fps, float source_duration) {
+    public void passMetaData(double source_fps, double source_duration) {
         this.sourceFps = source_fps;
         this.sourceTotalFrames = (int) (source_duration * sourceFps);
     }

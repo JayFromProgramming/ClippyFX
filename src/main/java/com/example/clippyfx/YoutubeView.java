@@ -1,11 +1,15 @@
 package com.example.clippyfx;
 
+import EncodingMagic.FilePegGenerator;
+import EncodingMagic.URLPegGenerator;
 import EncodingMagic.YoutubePegGenerator;
 import Interfaces.Method;
 import Interfaces.PegGenerator;
 import Interfaces.PopOut;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -23,6 +27,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
@@ -48,6 +54,23 @@ public class YoutubeView implements PopOut {
     private PegGenerator getPegGenerator(){
       YoutubePegGenerator pegGenerator = new YoutubePegGenerator(this.json);
       return pegGenerator;
+    }
+
+    private void createImporter(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/compatablityator-view.fxml"));
+            Scene scene = new Scene(loader.load(), 600, 400);
+            Stage stage = new Stage();
+            stage.setTitle("Compatablityator");
+            stage.setScene(scene);
+            stage.show();
+            ImporterView importerView = loader.getController();
+            URLPegGenerator urlPegGenerator = new URLPegGenerator(this.mainURI);
+            importerView.directLoad(this.videoURI, this.finishMethod, urlPegGenerator);
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            System.out.printf("Error: %s", e.getMessage());
+        }
+//        return importerView;
     }
 
     public void passObjects(TextField videoURI, Method finishMethod){ // Behaves like a constructor
@@ -209,10 +232,19 @@ public class YoutubeView implements PopOut {
 
     public void submitURI(MouseEvent mouseEvent) throws IOException {
         videoURI.setText(mainURI);
+        PegGenerator gen;
+        if (this.json.optString("extractor").equals("generic")){
+            System.out.print("Warning: extractor is generic\n");
+            // Use the url peg generator instead of the youtube one
+            this.createImporter();
+            return;
+        } else {
+            gen = this.getPegGenerator();
+            gen.passMetaData(this.json.optFloat("fps"), this.json.optFloat("duration"));
+        }
         System.out.println("Submitted URI: " + mainURI);
         this.isAlive = false;
-        this.getPegGenerator().passMetaData(this.json.optFloat("fps"), this.json.optFloat("duration"));
-        finishMethod.execute(this.getPegGenerator());
+        finishMethod.execute(gen);
         ((Stage) pane.getScene().getWindow()).close();
     }
 
